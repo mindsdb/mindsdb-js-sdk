@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Official JavaScript SDK for MindsDB",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
