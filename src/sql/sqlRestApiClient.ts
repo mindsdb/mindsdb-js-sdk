@@ -55,13 +55,16 @@ export default class SqlRestApiClient extends SqlApiClient {
     const resultRows = [];
     const respData = response['data'];
     for (let i = 0; i < respData.length; i++) {
-      const row = respData[i];
+      const rawRow = respData[i];
+      // A row is a dictionary of column name to the corresponding value.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const resultRow: Record<string, any> = {};
-      for (let j = 0; j < row.length; j++) {
-        resultRow[respColumnNames[j]] = row[j];
+      const row: Record<string, any> = {};
+      for (let j = 0; j < rawRow.length; j++) {
+        const colName = respColumnNames[j];
+        const rowVal = rawRow[j];
+        row[colName] = rowVal;
       }
-      resultRows.push(resultRow);
+      resultRows.push(row);
     }
     queryResult['rows'] = resultRows;
     return queryResult;

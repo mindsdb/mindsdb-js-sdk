@@ -26,15 +26,14 @@ function getCookieValue(
   allCookies: Array<string>,
   cookieKey: string
 ): string | undefined {
-  for (let i = 0; i < allCookies.length; i++) {
-    const cookie = allCookies[i];
-    const cookieComponents = cookie.split(';');
-    for (let j = 0; j < cookieComponents.length; j++) {
-      const component = cookieComponents[j].trim();
-      const keyAndValue = component.split('=');
-      if (keyAndValue[0] === cookieKey) {
-        return keyAndValue[1];
-      }
+  const allCookieComponents = allCookies.map((c) => c.split(';'));
+  for (let i = 0; i < allCookieComponents.length; i++) {
+    const keysAndValues = allCookieComponents[i].map((comp) =>
+      comp.trim().split('=')
+    );
+    // First key-value pair is the cookie value. Rest are keys like Domain, Path, etc.
+    if (keysAndValues[0][0] === cookieKey) {
+      return keysAndValues[0][1];
     }
   }
   return undefined;

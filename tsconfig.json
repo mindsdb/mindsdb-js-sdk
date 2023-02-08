@@ -4,7 +4,10 @@
     "module": "commonjs",
     "declaration": true,
     "outDir": "dist",
-    "strict": true
+    "strict": true,
+    "lib": [
+      "es2015"
+    ],
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/__tests__/*"]

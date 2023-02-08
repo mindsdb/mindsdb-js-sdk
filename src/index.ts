@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import SQLModule from './sql/sql';
+import SQLModule from './sql/sqlModule';
 import ConnectionOptions from './connectionOptions';
 import Constants from './constants';
 import { getCookieValue, isMindsDbCloudEndpoint } from './util/http';
