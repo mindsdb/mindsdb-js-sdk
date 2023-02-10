@@ -10,4 +10,7 @@ export default class Constants {
 
   /** MindsDB SQL query endpoint. */
   public static readonly BASE_SQL_URI = '/api/sql/query';
+
+  /** MindsDB Projects endpoint. */
+  public static readonly BASE_PROJECTS_URI = '/api/projects';
 }
