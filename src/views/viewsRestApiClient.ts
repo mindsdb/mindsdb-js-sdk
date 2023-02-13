@@ -29,7 +29,9 @@ export default class ViewsRestApiClient extends ViewsApiClient {
     const viewRows = sqlQueryResult.rows.filter(
       (r) => r['table_type'] === 'VIEW'
     );
-    return viewRows.map((v) => new View(this, v['tables_in_mindsdb'], project));
+    return viewRows.map(
+      (v) => new View(this, v[`tables_in_${project}`], project)
+    );
   }
 
   /**

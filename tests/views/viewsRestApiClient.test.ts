@@ -16,12 +16,12 @@ describe('Testing Views REST API client', () => {
   test('should get all views', async () => {
     const viewsRestApiClient = new ViewsRestApiClient(mockedSqlRestApiClient);
     const viewRows = [
-      { tables_in_mindsdb: 'my_view1', table_type: 'VIEW' },
-      { tables_in_mindsdb: 'my_view2', table_type: 'VIEW' },
+      { tables_in_my_test_project: 'my_view1', table_type: 'VIEW' },
+      { tables_in_my_test_project: 'my_view2', table_type: 'VIEW' },
     ];
     const unrelatedRows = [
-      { tables_in_mindsdb: 'my_model', table_type: 'MODEL' },
-      { tables_in_mindsdb: 'my_base_table', table_type: 'BASE_TABLE' },
+      { tables_in_my_test_project: 'my_model', table_type: 'MODEL' },
+      { tables_in_my_test_project: 'my_base_table', table_type: 'BASE_TABLE' },
     ];
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
