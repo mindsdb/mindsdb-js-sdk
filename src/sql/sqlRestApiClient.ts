@@ -42,9 +42,8 @@ export default class SqlRestApiClient extends SqlApiClient {
    * @returns {SqlQueryResult} - A structured query result in an easier to use format.
    */
   private makeQueryResult(response: SqlApiResponse): SqlQueryResult {
-    const respColumnNames = response['column_names'].map((name) =>
-      name.toLowerCase()
-    );
+    let respColumnNames = response['column_names'] || [];
+    respColumnNames = respColumnNames.map((name) => name.toLowerCase());
     const queryResult: SqlQueryResult = {
       columnNames: respColumnNames,
       context: response['context'],
@@ -53,7 +52,7 @@ export default class SqlRestApiClient extends SqlApiClient {
     };
 
     const resultRows = [];
-    const respData = response['data'];
+    const respData = response['data'] || [];
     for (let i = 0; i < respData.length; i++) {
       const rawRow = respData[i];
       // A row is a dictionary of column name to the corresponding value.

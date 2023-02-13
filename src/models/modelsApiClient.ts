@@ -1,0 +1,118 @@
+import { Model, ModelFeatureDescription, ModelPrediction } from './model';
+import { BatchQueryOptions, QueryOptions } from './queryOptions';
+import { AdjustOptions, TrainingOptions } from './trainingOptions';
+
+/**
+ * Abstract class outlining Model API operations supported by the SDK.
+ */
+export default abstract class ModelsApiClient {
+  /**
+   * Gets a model by name and project.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   * @returns {Promise<Model | undefined>} - The matching model, or undefined if none exists.
+   */
+  abstract getModel(name: string, project: string): Promise<Model | undefined>;
+
+  /**
+   * Gets all models associated with a project.
+   * @param {string} project - Project the models belong to.
+   * @returns {Promise<Array<Model>>} - All models for the given project.
+   */
+  abstract getAllModels(project: string): Promise<Array<Model>>;
+
+  /**
+   * Describes the features of this model.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model.
+   */
+  abstract describeModel(
+    name: string,
+    project: string
+  ): Promise<Array<ModelFeatureDescription>>;
+
+  /**
+   * Deletes this model.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   *
+   */
+  abstract deleteModel(name: string, project: string): Promise<void>;
+
+  /**
+   * Queries this model for a single prediction. For batch predictions, use batchQuery.
+   * @param {string} name - Name of the model.
+   * @param {string} targetColumn - Column that the model predicts.
+   * @param {string} project - Project the model belongs to.
+   * @param {QueryOptions} options - Options to use when querying the model.
+   * @returns {Promise<ModelPrediction | undefined>} - The prediction result, or undefined if the model isn't valid on the backend.
+   */
+  abstract queryModel(
+    name: string,
+    targetColumn: string,
+    project: string,
+    options: QueryOptions
+  ): Promise<ModelPrediction | undefined>;
+
+  /**
+   * Queries this model for a batch prediction by joining with another data source.
+   * @param {string} name - Name of the model.
+   * @param {string} targetColumn - Column that the model predicts.
+   * @param {string} project - Project the model belongs to.
+   * @param {BatchQueryOptions} options - Options to use when querying the model.
+   * @returns {Promise<Array<ModelPrediction>>} - All prediction results from the batch query.
+   */
+  abstract batchQueryModel(
+    name: string,
+    targetColumn: string,
+    project: string,
+    options: BatchQueryOptions
+  ): Promise<Array<ModelPrediction>>;
+
+  /**
+   * Trains this model with the given options.
+   * @param {string} name - Name of the model.
+   * @param {string} targetColumn - Column for the model to predict.
+   * @param {string} project - Project the model belongs to.
+   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
+   * @param {TrainingOptions} options - Options to use when training the model.
+   */
+  abstract trainModel(
+    name: string,
+    targetColumn: string,
+    project: string,
+    integration: string,
+    options: TrainingOptions
+  ): Promise<void>;
+
+  /**
+   * Rerains this model with the given options.
+   * @param {string} name - Name of the model.
+   * @param {string} targetColumn - Column for the model to predict.
+   * @param {string} project - Project the model belongs to.
+   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
+   * @param {TrainingOptions} options - Options to use when retraining the model.
+   */
+  abstract retrainModel(
+    name: string,
+    targetColumn: string,
+    project: string,
+    integration: string,
+    options: TrainingOptions
+  ): Promise<void>;
+
+  /**
+   * Partially adjusts this model with the given options.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
+   * @param {AdjustOptions} options - Options to use when adjusting the model.
+   */
+  abstract adjustModel(
+    name: string,
+    project: string,
+    integration: string,
+    options: AdjustOptions
+  ): Promise<void>;
+}
