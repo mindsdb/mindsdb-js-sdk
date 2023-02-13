@@ -253,13 +253,11 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     if (sqlQueryResult.rows.length === 0) {
       return [];
     }
-    return sqlQueryResult.rows.map((r) => {
-      return {
-        value: r['predicted'],
-        explain: JSON.parse(r[`${targetColumn}_explain`] || '{}'),
-        data: r,
-      };
-    });
+    return sqlQueryResult.rows.map((r) => ({
+      value: r['predicted'],
+      explain: JSON.parse(r[`${targetColumn}_explain`] || '{}'),
+      data: r,
+    }));
   }
 
   /**

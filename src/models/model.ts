@@ -3,6 +3,10 @@ import ModelsApiClient from './modelsApiClient';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { AdjustOptions, TrainingOptions } from './trainingOptions';
 
+
+/** Status of a model being up to date or not. */
+type UpdateStatus = 'available' | 'updating' | 'up_to_date'
+
 /**
  * Structure of a row returned from the MindsDB model database via the SQL query API.
  */
@@ -23,7 +27,7 @@ interface ModelRow {
    *  Set to 'available' when a new version of MindsDB is available that makes the model obsolete, or
    *  when new data is available in the table that was used to train the model.
    */
-  update_status: 'available' | 'updating' | 'up_to_date';
+  update_status: UpdateStatus;
 
   /**
    * Model version.
@@ -102,7 +106,7 @@ class Model {
    *  Set to 'available' when a new version of MindsDB is available that makes the model obsolete, or
    *  when new data is available in the table that was used to train the model.
    */
-  updateStatus: 'available' | 'updating' | 'up_to_date';
+  updateStatus: UpdateStatus;
 
   /** Model version. */
   version: number;
@@ -121,7 +125,7 @@ class Model {
    * @param {string} project - Name of the project the model belongs to.
    * @param {string} targetColumn - Target column the model predicts.
    * @param {string} status - Training status of the model.
-   * @param {'available | 'updating' | 'up_to_date'} updateStatus - Status of the model being up to date or not.
+   * @param {UpdateStatus} updateStatus - Status of the model being up to date or not.
    * @param {number} version - Model version.
    * @param {number} [accuracy] - Accuracy of model predictions between 0 and 1.
    * @param {string} [tag] - User assigned model tag.
@@ -132,7 +136,7 @@ class Model {
     project: string,
     targetColumn: string,
     status: string,
-    updateStatus: 'available' | 'updating' | 'up_to_date',
+    updateStatus: UpdateStatus,
     version: number,
     accuracy?: number,
     tag?: string
