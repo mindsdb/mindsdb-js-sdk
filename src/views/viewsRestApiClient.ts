@@ -30,7 +30,7 @@ export default class ViewsRestApiClient extends ViewsApiClient {
       (r) => r['table_type'] === 'VIEW'
     );
     return viewRows.map(
-      (v) => new View(this, v[`tables_in_${project}`], project)
+      (v) => new View(this, v[`tables_in_${project.toLowerCase()}`], project)
     );
   }
 
