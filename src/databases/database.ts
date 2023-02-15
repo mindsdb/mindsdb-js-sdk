@@ -37,6 +37,6 @@ export default class Database {
 
   /** Deletes this database. */
   async delete(): Promise<void> {
-    this.databasesApiClient.deleteDatabase(this.name);
+    await this.databasesApiClient.deleteDatabase(this.name);
   }
 }
