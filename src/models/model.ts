@@ -162,6 +162,7 @@ class Model {
 
   /**
    * Deletes this model.
+   * @throws {MindsDbError} - Something went wrong deleting this model.
    */
   delete(): Promise<void> {
     return this.modelsApiClient.deleteModel(this.name, this.project);
@@ -170,9 +171,10 @@ class Model {
   /**
    * Queries this model for a single prediction. For batch predictions, use batchQuery.
    * @param {QueryOptions} options - Options to use when querying the model.
-   * @returns {Promise<ModelPrediction | undefined>} - The prediction result, or undefined if the model isn't valid on the backend.
+   * @returns {Promise<ModelPrediction>} - The prediction result.
+   * @throws {MindsDbError} - Something went wrong querying this model.
    */
-  query(options: QueryOptions): Promise<ModelPrediction | undefined> {
+  query(options: QueryOptions): Promise<ModelPrediction> {
     return this.modelsApiClient.queryModel(
       this.name,
       this.targetColumn,
@@ -185,6 +187,7 @@ class Model {
    * Queries this model for a batch prediction by joining with another data source.
    * @param {BatchQueryOptions} options - Options to use when querying the model.
    * @returns {Promise<Array<ModelPrediction>>} - All prediction results from the batch query.
+   * @throws {MindsDbError} - Something went wrong batch querying this model.
    */
   batchQuery(options: BatchQueryOptions): Promise<Array<ModelPrediction>> {
     return this.modelsApiClient.batchQueryModel(
@@ -199,6 +202,7 @@ class Model {
    * Retrains this model with the given options.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when retraining the model.
+   * @throws {MindsDbError} - Something went wrong retraining this model.
    */
   retrain(integration: string, options: TrainingOptions): Promise<void> {
     return this.modelsApiClient.retrainModel(
@@ -214,6 +218,7 @@ class Model {
    * Partially adjusts this model with the given options.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {AdjustOptions} options - Options to use when adjusting the model.
+   * @throws {MindsDbError} - Something went wrong adjusting this model.
    */
   adjust(integration: string, options: AdjustOptions): Promise<void> {
     return this.modelsApiClient.adjustModel(

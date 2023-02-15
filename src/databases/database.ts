@@ -35,7 +35,9 @@ export default class Database {
     this.engine = engine;
   }
 
-  /** Deletes this database. */
+  /** Deletes this database.
+   *  @throws {MindsDbError} - Something went wrong deleting the database.
+   */
   async delete(): Promise<void> {
     await this.databasesApiClient.deleteDatabase(this.name);
   }

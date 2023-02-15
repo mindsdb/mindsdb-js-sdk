@@ -25,7 +25,9 @@ export default class View {
     this.project = project;
   }
 
-  /** Deletes this view from the project it belongs to. */
+  /** Deletes this view from the project it belongs to.
+   *  @throws {MindsDbError} - Something went wrong deleting this view.
+   */
   async delete(): Promise<void> {
     await this.viewsApiClient.deleteView(this.name, this.project);
   }
