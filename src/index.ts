@@ -3,10 +3,11 @@ import axios from 'axios';
 import ModelsModule from './models/modelsModule';
 import ProjectsModule from './projects/projectsModule';
 import SQLModule from './sql/sqlModule';
+import ViewsModule from './views/viewsModule';
 import ConnectionOptions from './connectionOptions';
 import Constants from './constants';
 import { getCookieValue, isMindsDbCloudEndpoint } from './util/http';
-import tablesModule from './tables/tablesModule';
+import TablesModule from './tables/tablesModule';
 
 const defaultAxiosInstance = axios.create({
   baseURL: Constants.BASE_CLOUD_API_ENDPOINT,
@@ -15,7 +16,8 @@ const defaultAxiosInstance = axios.create({
 const SQL = new SQLModule.SqlRestApiClient(defaultAxiosInstance);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
 const Projects = new ProjectsModule.ProjectsRestApiClient(defaultAxiosInstance);
-const Tables = new tablesModule.TablesRestApiClient(SQL);
+const Tables = new TablesModule.TablesRestApiClient(SQL);
+const Views = new ViewsModule.ViewsRestApiClient(SQL);
 
 /**
  * Initializes the MindsDB SDK and authenticates the user if needed.
@@ -44,4 +46,4 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   }
 };
 
-export default { connect, SQL, Models, Projects, Tables };
+export default { connect, SQL, Models, Projects, Tables, Views };
