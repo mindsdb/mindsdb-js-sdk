@@ -203,7 +203,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     targetColumn: string,
     project: string,
     options: QueryOptions
-  ): Promise<ModelPrediction | undefined> {
+  ): Promise<ModelPrediction> {
     const selectClause = `SELECT * FROM ${mysql.escapeId(
       project
     )}.${mysql.escapeId(name)}`;

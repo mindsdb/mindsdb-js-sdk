@@ -55,7 +55,7 @@ export default abstract class ModelsApiClient {
     targetColumn: string,
     project: string,
     options: QueryOptions
-  ): Promise<ModelPrediction | undefined>;
+  ): Promise<ModelPrediction>;
 
   /**
    * Queries this model for a batch prediction by joining with another data source.
