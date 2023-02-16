@@ -81,11 +81,12 @@ export default class SqlRestApiClient extends SqlApiClient {
     const queryRequest = {
       query,
     };
+    const { session, client } = this;
     try {
-      const queryResponse = await this.client.post(
+      const queryResponse = await client.post(
         this.getQueryUrl(),
         queryRequest,
-        getBaseRequestConfig(this.session)
+        getBaseRequestConfig(session)
       );
       const responseData: SqlApiResponse = queryResponse.data;
       return this.makeQueryResult(responseData);
@@ -94,7 +95,7 @@ export default class SqlRestApiClient extends SqlApiClient {
         throw MindsDbError.fromAxiosError(error);
       }
       throw new MindsDbError(
-        `Something went wrong handling HTTP POST request to ${this.getQueryUrl()}`
+        `Something went wrong handling HTTP POST request to ${this.getQueryUrl()}: ${error}`
       );
     }
   }
