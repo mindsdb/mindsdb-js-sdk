@@ -7,12 +7,14 @@ import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
 import ConnectionOptions from './connectionOptions';
 import Constants from './constants';
-import { getCookieValue, isMindsDbCloudEndpoint } from './util/http';
+import {
+  createDefaultAxiosInstance,
+  getCookieValue,
+  isMindsDbCloudEndpoint,
+} from './util/http';
 import TablesModule from './tables/tablesModule';
 
-const defaultAxiosInstance = axios.create({
-  baseURL: Constants.BASE_CLOUD_API_ENDPOINT,
-});
+const defaultAxiosInstance = createDefaultAxiosInstance();
 
 const SQL = new SQLModule.SqlRestApiClient(defaultAxiosInstance);
 const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
