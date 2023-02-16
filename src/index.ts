@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import ModelsModule from './models/modelsModule';
+import DatabasesModule from './databases/databasesModule';
 import ProjectsModule from './projects/projectsModule';
 import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
@@ -14,6 +15,7 @@ const defaultAxiosInstance = axios.create({
 });
 
 const SQL = new SQLModule.SqlRestApiClient(defaultAxiosInstance);
+const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
 const Projects = new ProjectsModule.ProjectsRestApiClient(defaultAxiosInstance);
 const Tables = new TablesModule.TablesRestApiClient(SQL);
@@ -46,4 +48,4 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   }
 };
 
-export default { connect, SQL, Models, Projects, Tables, Views };
+export default { connect, SQL, Databases, Models, Projects, Tables, Views };
