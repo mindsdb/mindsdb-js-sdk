@@ -20,4 +20,7 @@ export default interface SqlQueryResult {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: Array<Record<string, any>>;
+
+  /** Error message if the SQL query failed. */
+  error_message?: string;
 }

@@ -2,6 +2,7 @@ import mysql from 'mysql';
 
 import SqlApiClient from '../sql/sqlApiClient';
 import { JsonValue } from '../util/json';
+import { MindsDbError } from '../errors';
 import Database from './database';
 import DatabasesApiClient from './databasesApiClient';
 
@@ -59,6 +60,7 @@ export default class DatabasesRestApiClient extends DatabasesApiClient {
    * @param {string} [engine] - Optional name of the database engine.
    * @param {string} [params] - Optional parameters used to connect to the database (e.g. user, password).
    * @returns {Promise<Database>} - Newly created database.
+   * @throws {MindsDbError} - Something went wrong creating the database.
    */
   override async createDatabase(
     name: string,
@@ -84,16 +86,23 @@ export default class DatabasesRestApiClient extends DatabasesApiClient {
     const createDatabaseQuery = [createClause, engineClause, paramsClause].join(
       '\n'
     );
-    await this.sqlClient.runQuery(createDatabaseQuery);
+    const sqlQueryResult = await this.sqlClient.runQuery(createDatabaseQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
     return new Database(this, name, type, engine);
   }
 
   /**
    * Deletes a database by name.
    * @param {string} name - Name of the database to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the database.
    */
   override async deleteDatabase(name: string): Promise<void> {
     const dropDatabaseQuery = `DROP DATABASE ${mysql.escapeId(name)}`;
-    await this.sqlClient.runQuery(dropDatabaseQuery);
+    const sqlQueryResult = await this.sqlClient.runQuery(dropDatabaseQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 }

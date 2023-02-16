@@ -9,6 +9,7 @@ import {
   ModelRow,
 } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
+import { MindsDbError } from '../errors';
 
 /** Implementation of ModelsApiClient that goes through the REST API */
 export default class ModelsRestApiClient extends ModelsApiClient {
@@ -155,7 +156,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model.
+   * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
   override async describeModel(
     name: string,
@@ -175,13 +176,17 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Deletes this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @throws {MindsDB} - Something went wrong deleting the model.
    *
    */
   override async deleteModel(name: string, project: string): Promise<void> {
     const deleteQuery = `DROP MODEL ${mysql.escapeId(project)}.${mysql.escapeId(
       name
     )}`;
-    await this.sqlClient.runQuery(deleteQuery);
+    const sqlQueryResult = await this.sqlClient.runQuery(deleteQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 
   /**
@@ -190,22 +195,23 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} targetColumn - Column that the model predicts.
    * @param {string} project - Project the model belongs to.
    * @param {QueryOptions} options - Options to use when querying the model.
-   * @returns {Promise<ModelPrediction | undefined>} - The prediction result, or undefined if the model isn't valid on the backend.
+   * @returns {Promise<ModelPrediction>} - The prediction result.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async queryModel(
     name: string,
     targetColumn: string,
     project: string,
     options: QueryOptions
-  ): Promise<ModelPrediction | undefined> {
+  ): Promise<ModelPrediction> {
     const selectClause = `SELECT * FROM ${mysql.escapeId(
       project
     )}.${mysql.escapeId(name)}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const selectQuery = [selectClause, whereClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
-    if (sqlQueryResult.rows.length === 0) {
-      return undefined;
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
     }
     const predictionRow = sqlQueryResult.rows[0];
     const prediction = {
@@ -223,6 +229,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {BatchQueryOptions} options - Options to use when querying the model.
    * @returns {Promise<Array<ModelPrediction>>} - All prediction results from the batch query.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async batchQueryModel(
     name: string,
@@ -250,8 +257,8 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       limitClause,
     ].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
-    if (sqlQueryResult.rows.length === 0) {
-      return [];
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
     }
     return sqlQueryResult.rows.map((r) => ({
       value: r['predicted'],
@@ -267,6 +274,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when training the model.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async trainModel(
     name: string,
@@ -299,7 +307,10 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     ]
       .filter((s) => s)
       .join('\n');
-    await this.sqlClient.runQuery(query);
+    const sqlQueryResult = await this.sqlClient.runQuery(query);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 
   /**
@@ -309,6 +320,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when retraining the model.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async retrainModel(
     name: string,
@@ -341,7 +353,10 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     ]
       .filter((s) => s)
       .join('\n');
-    await this.sqlClient.runQuery(query);
+    const sqlQueryResult = await this.sqlClient.runQuery(query);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 
   /**
@@ -350,6 +365,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {AdjustOptions} options - Options to use when adjusting the model.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async adjustModel(
     name: string,
@@ -363,6 +379,9 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const selectClause = this.makeTrainingSelectClause(adjustOptions['select']);
     const usingClause = this.makeTrainingUsingClause(adjustOptions);
     const query = [adjustClause, selectClause, usingClause].join('\n');
-    await this.sqlClient.runQuery(query);
+    const sqlQueryResult = await this.sqlClient.runQuery(query);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 }

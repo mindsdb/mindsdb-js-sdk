@@ -17,6 +17,7 @@ export default abstract class ViewsApiClient {
    * @param {string} project - Project the view will be created in.
    * @param {string} select - SELECT statement to use for initializing the view.
    * @returns {Promise<View>} - Newly created view.
+   * @throws {MindsDbError} - Something went wrong while creating the view.
    */
   abstract createView(
     name: string,
@@ -28,6 +29,7 @@ export default abstract class ViewsApiClient {
    * Deletes a view from the project it belongs to.
    * @param {string} name - Name of the view to delete.
    * @param {string} project - Project the view belongs to.
+   * @throws {MindsDbError} - Something went wrong while deleting the view.
    */
   abstract deleteView(name: string, project: string): Promise<void>;
 }

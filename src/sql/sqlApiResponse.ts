@@ -21,4 +21,10 @@ export default interface SqlApiResponse {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Array<Array<any>>;
+
+  /** Error code if the SQL API request failed. */
+  error_code?: number;
+
+  /** Error message if the SQL API request failed. */
+  error_message?: string;
 }

@@ -1,5 +1,31 @@
-import { AxiosRequestConfig } from 'axios';
+import axios, { Axios, AxiosRequestConfig } from 'axios';
+import Agent, { HttpsAgent } from 'agentkeepalive';
+import Constants from '../constants';
 
+/**
+ * Creates the default Axios instance to use for all SDK HTTP requests.
+ * @returns {Axios} - Axios instance with sensible defaults.
+ */
+function createDefaultAxiosInstance(): Axios {
+  const keepAliveAgent = new Agent({
+    maxSockets: Constants.DEFAULT_MAX_SOCKETS_PER_HOST,
+    maxFreeSockets: Constants.DEFAULT_MAX_FREE_SOCKETS,
+    timeout: Constants.DEFAULT_ACTIVE_SOCKET_TIMEOUT_MS,
+    freeSocketTimeout: Constants.DEFAULT_FREE_SOCKET_TIMEOUT_MS,
+  });
+  const httpsKeepAliveAgent = new HttpsAgent({
+    maxSockets: Constants.DEFAULT_MAX_SOCKETS_PER_HOST,
+    maxFreeSockets: Constants.DEFAULT_MAX_FREE_SOCKETS,
+    timeout: Constants.DEFAULT_ACTIVE_SOCKET_TIMEOUT_MS,
+    freeSocketTimeout: Constants.DEFAULT_FREE_SOCKET_TIMEOUT_MS,
+  });
+  return axios.create({
+    baseURL: Constants.BASE_CLOUD_API_ENDPOINT,
+    timeout: Constants.DEFAULT_HTTP_TIMEOUT_MS,
+    httpAgent: keepAliveAgent,
+    httpsAgent: httpsKeepAliveAgent,
+  });
+}
 /**
  * Gets the base HTTP request config to use for all REST API requests.
  * @param {string | undefined} session - Session to use for authentication. Only used for Cloud endpoints.
@@ -52,4 +78,9 @@ function isMindsDbCloudEndpoint(url: string): boolean {
   return url.includes('mindsdb.com');
 }
 
-export { getBaseRequestConfig, getCookieValue, isMindsDbCloudEndpoint };
+export {
+  createDefaultAxiosInstance,
+  getBaseRequestConfig,
+  getCookieValue,
+  isMindsDbCloudEndpoint,
+};

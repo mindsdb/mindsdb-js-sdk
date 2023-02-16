@@ -24,6 +24,7 @@ export default abstract class DatabasesApiClient {
    * @param {string} [engine] - Optional name of the database engine.
    * @param {string} [params] - Optional parameters used to connect to the database (e.g. user, password).
    * @returns {Promise<Database>} - Newly created database.
+   * @throws {MindsDbError} - Something went wrong creating the database.
    */
   abstract createDatabase(
     name: string,
@@ -34,6 +35,7 @@ export default abstract class DatabasesApiClient {
   /**
    * Deletes a database by name.
    * @param {string} name - Name of the database to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the database.
    */
   abstract deleteDatabase(name: string): Promise<void>;
 }

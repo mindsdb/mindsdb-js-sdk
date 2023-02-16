@@ -1,4 +1,5 @@
 import mysql from 'mysql';
+import { MindsDbError } from '../errors';
 
 import SqlApiClient from '../sql/sqlApiClient';
 import View from './view';
@@ -40,6 +41,7 @@ export default class ViewsRestApiClient extends ViewsApiClient {
    * @param {string} project - Project the view will be created in.
    * @param {string} select - SELECT statement to use for initializing the view.
    * @returns {Promise<View>} - Newly created view.
+   * @throws {MindsDbError} - Something went wrong while creating the view.
    */
   override async createView(
     name: string,
@@ -49,7 +51,10 @@ export default class ViewsRestApiClient extends ViewsApiClient {
     const createViewQuery = `CREATE VIEW ${mysql.escapeId(
       project
     )}.${mysql.escapeId(name)} AS (${select})`;
-    await this.sqlClient.runQuery(createViewQuery);
+    const sqlQueryResult = await this.sqlClient.runQuery(createViewQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
     return new View(this, name, project);
   }
 
@@ -57,12 +62,16 @@ export default class ViewsRestApiClient extends ViewsApiClient {
    * Deletes a view from the project it belongs to.
    * @param {string} name - Name of the view to delete.
    * @param {string} project - Project the view belongs to.
+   * @throws {MindsDbError} - Something went wrong while deleting the view.
    */
   override async deleteView(name: string, project: string): Promise<void> {
     // We use DROP MODEL instead of DROP TABLE since we can scope DROP MODEL by project.
     const dropModelQuery = `DROP MODEL ${mysql.escapeId(
       project
     )}.${mysql.escapeId(name)}`;
-    await this.sqlClient.runQuery(dropModelQuery);
+    const sqlQueryResult = await this.sqlClient.runQuery(dropModelQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 }

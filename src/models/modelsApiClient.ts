@@ -25,7 +25,7 @@ export default abstract class ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model.
+   * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
   abstract describeModel(
     name: string,
@@ -36,6 +36,7 @@ export default abstract class ModelsApiClient {
    * Deletes this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @throws {MindsDB} - Something went wrong deleting the model.
    *
    */
   abstract deleteModel(name: string, project: string): Promise<void>;
@@ -46,14 +47,15 @@ export default abstract class ModelsApiClient {
    * @param {string} targetColumn - Column that the model predicts.
    * @param {string} project - Project the model belongs to.
    * @param {QueryOptions} options - Options to use when querying the model.
-   * @returns {Promise<ModelPrediction | undefined>} - The prediction result, or undefined if the model isn't valid on the backend.
+   * @returns {Promise<ModelPrediction>} - The prediction result.
+   * @throws {MindsDbError} - Something went wrong querying the model.
    */
   abstract queryModel(
     name: string,
     targetColumn: string,
     project: string,
     options: QueryOptions
-  ): Promise<ModelPrediction | undefined>;
+  ): Promise<ModelPrediction>;
 
   /**
    * Queries this model for a batch prediction by joining with another data source.
@@ -62,6 +64,7 @@ export default abstract class ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {BatchQueryOptions} options - Options to use when querying the model.
    * @returns {Promise<Array<ModelPrediction>>} - All prediction results from the batch query.
+   * @throws {MindsDbError} - Something went wrong batch querying the model.
    */
   abstract batchQueryModel(
     name: string,
@@ -77,6 +80,7 @@ export default abstract class ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when training the model.
+   * @throws {MindsDbError} - Something went wrong training the model.
    */
   abstract trainModel(
     name: string,
@@ -93,6 +97,7 @@ export default abstract class ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when retraining the model.
+   * @throws {MindsDbError} - Something went wrong retraining the model.
    */
   abstract retrainModel(
     name: string,
@@ -108,6 +113,7 @@ export default abstract class ModelsApiClient {
    * @param {string} project - Project the model belongs to.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {AdjustOptions} options - Options to use when adjusting the model.
+   * @throws {MindsDbError} - Something went wrong adjusting the model.
    */
   abstract adjustModel(
     name: string,

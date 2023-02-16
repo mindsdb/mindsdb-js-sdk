@@ -1,10 +1,11 @@
-import { Axios } from 'axios';
+import { Axios, AxiosError } from 'axios';
 
 import SqlApiClient from './sqlApiClient';
 import Constants from '../constants';
 import SqlApiResponse from './sqlApiResponse';
 import SqlQueryResult from './sqlQueryResult';
 import { getBaseRequestConfig } from '../util/http';
+import { MindsDbError } from '../errors';
 
 /**
  * Class to perform SQL operations through the REST API.
@@ -49,6 +50,7 @@ export default class SqlRestApiClient extends SqlApiClient {
       context: response['context'],
       type: response['type'],
       rows: [],
+      error_message: response['error_message'],
     };
 
     const resultRows = [];
@@ -73,17 +75,28 @@ export default class SqlRestApiClient extends SqlApiClient {
    * Runs the given SQL query on the backend.
    * @param {string} query - The raw SQL query to run.
    * @returns {Promise<SqlQueryResult>} - A structured query result from running the raw SQL query.
+   * @throws {MindsDbError} - Something went wrong sending the API request.
    */
   override async runQuery(query: string): Promise<SqlQueryResult> {
     const queryRequest = {
       query,
     };
-    const queryResponse = await this.client.post(
-      this.getQueryUrl(),
-      queryRequest,
-      getBaseRequestConfig(this.session)
-    );
-    const responseData: SqlApiResponse = queryResponse.data;
-    return this.makeQueryResult(responseData);
+    const { session, client } = this;
+    try {
+      const queryResponse = await client.post(
+        this.getQueryUrl(),
+        queryRequest,
+        getBaseRequestConfig(session)
+      );
+      const responseData: SqlApiResponse = queryResponse.data;
+      return this.makeQueryResult(responseData);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw MindsDbError.fromAxiosError(error);
+      }
+      throw new MindsDbError(
+        `Something went wrong handling HTTP POST request to ${this.getQueryUrl()}: ${error}`
+      );
+    }
   }
 }

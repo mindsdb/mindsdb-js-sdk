@@ -32,6 +32,7 @@ export default class Table {
 
   /**
    * Deletes this table from its integration.
+   * @throws {MindsDbError} - Something went wrong deleting this table.
    */
   async delete(): Promise<void> {
     await this.tablesApiClient.deleteTable(this.name, this.integration);
