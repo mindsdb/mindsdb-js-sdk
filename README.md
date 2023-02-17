@@ -1,5 +1,7 @@
 # MindsDB JavaScript SDK
 
+[**Full SDK docs**[(https://mindsdb.github.io/mindsdb-js-sdk/)]
+
 The [MindsDB](https://mindsdb.com/) JavaScript SDK allows you to unlock the power of machine learning right inside your web applications. We provide interfaces to perform most MindsDB operations, such as training and querying models, and connecting your own datasources to MindsDB.
 
 ## Getting Started
