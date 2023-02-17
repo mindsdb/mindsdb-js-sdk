@@ -29,6 +29,8 @@ const Views = new ViewsModule.ViewsRestApiClient(SQL);
  */
 const connect = async function (options: ConnectionOptions): Promise<void> {
   const httpClient = options.httpClient || defaultAxiosInstance;
+  httpClient.defaults.baseURL =
+    options.host || Constants.BASE_CLOUD_API_ENDPOINT;
   SQL.client = httpClient;
   Projects.client = httpClient;
   const baseURL =
