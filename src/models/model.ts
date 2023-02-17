@@ -204,13 +204,20 @@ class Model {
    * @param {TrainingOptions} options - Options to use when retraining the model.
    * @throws {MindsDbError} - Something went wrong retraining this model.
    */
-  retrain(integration: string, options: TrainingOptions): Promise<void> {
+  retrain(integration?: string, options?: TrainingOptions): Promise<void> {
+    if (integration && options) {
+      return this.modelsApiClient.retrainModel(
+        this.name,
+        this.targetColumn,
+        this.project,
+        integration,
+        options
+      );
+    }
     return this.modelsApiClient.retrainModel(
       this.name,
       this.targetColumn,
-      this.project,
-      integration,
-      options
+      this.project
     );
   }
 
