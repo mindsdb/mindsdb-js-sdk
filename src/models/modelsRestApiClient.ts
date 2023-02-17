@@ -318,41 +318,44 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} targetColumn - Column for the model to predict.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
-   * @param {TrainingOptions} options - Options to use when retraining the model.
+   * @param {string} [integration] - Integration name for the training data (e.g. mindsdb).
+   * @param {TrainingOptions} [options] - Options to use when retraining the model.
    * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async retrainModel(
     name: string,
     targetColumn: string,
     project: string,
-    integration: string,
-    trainingOptions: TrainingOptions
+    integration?: string,
+    trainingOptions?: TrainingOptions
   ): Promise<void> {
     const retrainClause = this.makeRetrainClause(name, project);
-    const fromClause = this.makeTrainingFromClause(integration);
-    const selectClause = this.makeTrainingSelectClause(
-      trainingOptions['select']
-    );
-    const predictClause = this.makeTrainingPredictClause(targetColumn);
-    const orderByClause = this.makeTrainingOrderByClause(trainingOptions);
-    const groupByClause = this.makeTrainingGroupByClause(trainingOptions);
-    const windowHorizonClause =
-      this.makeTrainingWindowHorizonClause(trainingOptions);
-    const usingClause = this.makeTrainingUsingClause(trainingOptions);
+    let query = retrainClause;
+    if (integration && trainingOptions) {
+      const fromClause = this.makeTrainingFromClause(integration);
+      const selectClause = this.makeTrainingSelectClause(
+        trainingOptions['select']
+      );
+      const predictClause = this.makeTrainingPredictClause(targetColumn);
+      const orderByClause = this.makeTrainingOrderByClause(trainingOptions);
+      const groupByClause = this.makeTrainingGroupByClause(trainingOptions);
+      const windowHorizonClause =
+        this.makeTrainingWindowHorizonClause(trainingOptions);
+      const usingClause = this.makeTrainingUsingClause(trainingOptions);
+      query = [
+        retrainClause,
+        fromClause,
+        selectClause,
+        predictClause,
+        groupByClause,
+        orderByClause,
+        windowHorizonClause,
+        usingClause,
+      ]
+        .filter((s) => s)
+        .join('\n');
+    }
 
-    const query = [
-      retrainClause,
-      fromClause,
-      selectClause,
-      predictClause,
-      groupByClause,
-      orderByClause,
-      windowHorizonClause,
-      usingClause,
-    ]
-      .filter((s) => s)
-      .join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(query);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);

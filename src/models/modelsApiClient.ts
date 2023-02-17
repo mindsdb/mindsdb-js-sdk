@@ -111,14 +111,14 @@ export default abstract class ModelsApiClient {
    * Partially adjusts this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
-   * @param {AdjustOptions} options - Options to use when adjusting the model.
+   * @param {string} [integration] - Integration name for the training data (e.g. mindsdb).
+   * @param {AdjustOptions} [options] - Options to use when adjusting the model.
    * @throws {MindsDbError} - Something went wrong adjusting the model.
    */
   abstract adjustModel(
     name: string,
     project: string,
-    integration: string,
-    options: AdjustOptions
+    integration?: string,
+    options?: AdjustOptions
   ): Promise<void>;
 }
