@@ -220,6 +220,45 @@ try {
 }
 ```
 
+### Retraining & Adjusting Models
+
+The following code example assumes you already imported and connected to MindsDB.
+
+Retraining: 
+```typescript
+const homeRentalPriceModel = await MindsDB.Models.getModel('home_rentals_model', 'mindsdb');
+
+if (homeRentalPriceModel.updateStatus === 'available') {
+  try {
+    // Equivalent to SQL 'RETRAIN mindsdb.home_rentals_model'.
+    // For custom retraining:
+    // homerentalPriceModel.retrain('example_db', trainingOptions);
+    // See training options in Training & Querying example for more context.
+    // Does NOT block on training. The promise resolves after training starts.
+    await homeRentalPriceModel.retrain();
+  } catch (error) {
+    // Something went wrong with retraining.
+  }
+}
+```
+
+Adjusting:
+```typescript
+const homeRentalPriceModel = await MindsDB.Models.getModel('home_rentals_model', 'mindsdb');
+
+const adjustSelect = 'SELECT * FROM demo_data.home_rentals WHERE days_on_market >= 10';
+const params = { 'key' : 'value' }
+
+try {
+  // Does NOT block on adjusting. The promise resolves after adjusting starts.
+  await homeRentalPriceModel.adjust(
+    'example_db',
+    { select: adjustSelect, using: params });
+} catch (error) {
+  // Something went wrong adjusting.
+}
+```
+
 ### Creating Views
 
 After you create a view, you can query it by including it in SELECT statements as if it's a table.

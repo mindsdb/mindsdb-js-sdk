@@ -103,8 +103,8 @@ export default abstract class ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    integration: string,
-    options: TrainingOptions
+    integration?: string,
+    options?: TrainingOptions
   ): Promise<void>;
 
   /**
