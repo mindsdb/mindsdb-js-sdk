@@ -1,7 +1,17 @@
 {
-  "name": "mindsdb-sdk",
-  "version": "1.0.0",
+  "name": "mindsdb-js-sdk",
+  "version": "2.0.0",
+  "author": "MindsDB",
+  "license": "MIT",
   "description": "Official JavaScript SDK for MindsDB",
+  "homepage": "https://github.com/mindsdb/mindsdb-js-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindsdb/mindsdb-js-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mindsdb/mindsdb-js-sdk/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -15,8 +25,6 @@
     "machine-learning",
     "mindsdb-sdk"
   ],
-  "author": "MindsDB",
-  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.4.0",
     "@types/mysql": "^2.15.21",
