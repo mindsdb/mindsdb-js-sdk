@@ -1,6 +1,6 @@
 {
   "name": "mindsdb-js-sdk",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "MindsDB",
   "license": "MIT",
   "description": "Official JavaScript SDK for MindsDB",

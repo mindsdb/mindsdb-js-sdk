@@ -19,7 +19,6 @@ We have full TypeScript support.
 
 ## Usage Examples
 
-Full SDK documentation coming soon.
 
 ### Connecting to MindsDB
 
@@ -97,6 +96,22 @@ try {
   // Couldn't connect to database.
 }
 ```
+
+### Getting & Deleting a Database
+
+```typescript
+// Can also use MindsDB.Databases.getAllDatabases() to get all databases.
+const dbToDelete = await MindsDB.Databases.getDatabase('useless_db');
+if (dbToDelete) {
+  try {
+    // Can also call MindsDB.Databases.deleteDatabase('useless_db') directly.
+    await dbToDelete.delete();
+  } catch (error) {
+    // Something went wrong while deleting the database.
+  }
+}
+```
+
 ### Running SQL Queries
 
 The following code example assumes you already imported and connected to MindsDB.
@@ -123,9 +138,25 @@ try {
 }
 ```
 
+### Getting Projects
+
+The following code examples assumes you already imported and connected to MindsDB.
+
+```typescript
+const allProjects = await MindsDB.Projects.getAllProjects();
+allProjects.forEach(p => {
+  console.log(p.name);
+});
+```
+
 ### Training & Querying Models
 
 The following code example assumes you already imported and connected to MindsDB.
+
+See [full training options docs](https://mindsdb.github.io/mindsdb-js-sdk/interfaces/models_trainingOptions.TrainingOptions.html)
+
+See [full query options docs](https://mindsdb.github.io/mindsdb-js-sdk/interfaces/models_queryOptions.QueryOptions.html) and [full batch query options docs](https://mindsdb.github.io/mindsdb-js-sdk/interfaces/models_queryOptions.BatchQueryOptions.html)
+
 
 Simple queries:
 ```typescript
@@ -208,7 +239,10 @@ try {
   console.log(modelDescription);
 
   const queryOptions = {
+    // Join model to this data source.
     join: 'example_db.demo_data.house_sales',
+    // When using batch queries, the 't' alias is used for the joined data source ('t' is short for training/test).
+    // The 'm' alias is used for the trained model to be queried.
     where: ['t.saledate > LATEST', 't.type = "house"'],
     limit: 4
   }
@@ -226,6 +260,10 @@ try {
 ### Retraining & Adjusting Models
 
 The following code example assumes you already imported and connected to MindsDB.
+
+See [full training options docs](https://mindsdb.github.io/mindsdb-js-sdk/interfaces/models_trainingOptions.TrainingOptions.html)
+
+See [full adjust options docs](https://mindsdb.github.io/mindsdb-js-sdk/interfaces/models_trainingOptions.AdjustOptions.html)
 
 Retraining: 
 ```typescript
