@@ -1,6 +1,14 @@
-import axios, { Axios, AxiosRequestConfig } from 'axios';
+import axios, {
+  Axios,
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import Constants from '../constants';
+import HttpAuthenticator from '../httpAuthenticator';
+import { MindsDbError } from '../errors';
 
 /**
  * Creates the default Axios instance to use for all SDK HTTP requests.
@@ -28,14 +36,16 @@ function createDefaultAxiosInstance(): Axios {
 }
 /**
  * Gets the base HTTP request config to use for all REST API requests.
- * @param {string | undefined} session - Session to use for authentication. Only used for Cloud endpoints.
+ * @param {HttpAuthenticator} authenticator - HTTP authenticator used for authentication. Only used for Cloud endpoints.
  * @returns {AxiosRequestConfig} - Request configuration compatible with Axios.
  */
-function getBaseRequestConfig(session: string | undefined): AxiosRequestConfig {
+function getBaseRequestConfig(
+  authenticator: HttpAuthenticator
+): AxiosRequestConfig {
   const requestConfig: AxiosRequestConfig = {};
-  if (session) {
+  if (authenticator.session) {
     requestConfig['headers'] = {
-      Cookie: `session=${session}`,
+      Cookie: `session=${authenticator.session}`,
     };
   }
   return requestConfig;
@@ -78,9 +88,41 @@ function isMindsDbCloudEndpoint(url: string): boolean {
   return url.includes('mindsdb.com');
 }
 
+/**
+ * Retries requests once that failed for authentication reasons (unauthorized/forbidden).
+ * @param {AxiosError} error - Error returned from HTTP request.
+ * @param {Axios} client - Axios client to handle reauthentication requests.
+ * @param {HttpAuthenticator} authenticator - Authenticator to use for reauthenticating.
+ * @returns {AxiosResponse} - Response for retrying original request that failed.
+ */
+async function retryUnauthenticatedRequest(
+  error: AxiosError,
+  client: Axios,
+  authenticator: HttpAuthenticator
+): Promise<AxiosResponse> {
+  if (!error.config) {
+    throw error;
+  }
+  const originalRequestConfig: InternalAxiosRequestConfig & {
+    _retried?: boolean;
+  } = error.config;
+  if (
+    !originalRequestConfig._retried &&
+    (await authenticator.handleReauthentication(client, error))
+  ) {
+    originalRequestConfig.headers[
+      'Cookie'
+    ] = `session=${authenticator.session}`;
+    originalRequestConfig._retried = true;
+    return client.request(originalRequestConfig);
+  }
+  throw error;
+}
+
 export {
   createDefaultAxiosInstance,
   getBaseRequestConfig,
   getCookieValue,
   isMindsDbCloudEndpoint,
+  retryUnauthenticatedRequest,
 };

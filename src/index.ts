@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import ModelsModule from './models/modelsModule';
 import DatabasesModule from './databases/databasesModule';
 import ProjectsModule from './projects/projectsModule';
@@ -9,46 +7,65 @@ import ConnectionOptions from './connectionOptions';
 import Constants from './constants';
 import {
   createDefaultAxiosInstance,
-  getCookieValue,
   isMindsDbCloudEndpoint,
+  retryUnauthenticatedRequest,
 } from './util/http';
 import TablesModule from './tables/tablesModule';
+import HttpAuthenticator from './httpAuthenticator';
+import { MindsDbError } from './errors';
+import { Axios } from 'axios';
 
 const defaultAxiosInstance = createDefaultAxiosInstance();
+const httpAuthenticator = new HttpAuthenticator();
 
-const SQL = new SQLModule.SqlRestApiClient(defaultAxiosInstance);
+const SQL = new SQLModule.SqlRestApiClient(
+  defaultAxiosInstance,
+  httpAuthenticator
+);
 const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
-const Projects = new ProjectsModule.ProjectsRestApiClient(defaultAxiosInstance);
+const Projects = new ProjectsModule.ProjectsRestApiClient(
+  defaultAxiosInstance,
+  httpAuthenticator
+);
 const Tables = new TablesModule.TablesRestApiClient(SQL);
 const Views = new ViewsModule.ViewsRestApiClient(SQL);
 
-/**
- * Initializes the MindsDB SDK and authenticates the user if needed.
- * @param {ConnectionOptions} options - Options to use for initialization
- */
-const connect = async function (options: ConnectionOptions): Promise<void> {
+const getAxiosInstance = function (options: ConnectionOptions): Axios {
   const httpClient = options.httpClient || defaultAxiosInstance;
   httpClient.defaults.baseURL =
     options.host || Constants.BASE_CLOUD_API_ENDPOINT;
+  // Retry failed requests with 401/403 status code once.
+  httpClient.interceptors.response.use(
+    (resp) => resp,
+    async (error) =>
+      retryUnauthenticatedRequest(error, httpClient, httpAuthenticator)
+  );
+  return httpClient;
+};
+
+/**
+ * Initializes the MindsDB SDK and authenticates the user if needed.
+ * @param {ConnectionOptions} options - Options to use for initialization.
+ * @throws {MindsDbError} - MindsDB authentication request failed.
+ */
+const connect = async function (options: ConnectionOptions): Promise<void> {
+  const httpClient = getAxiosInstance(options);
   SQL.client = httpClient;
   Projects.client = httpClient;
   const baseURL =
     httpClient.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
   // Need to authenticate if we're using the Cloud API endpoints.
   if (isMindsDbCloudEndpoint(baseURL)) {
-    const loginURL = new URL(Constants.BASE_LOGIN_URI, baseURL);
-    const loginResponse = await httpClient.post(loginURL.href, {
-      email: options.user,
-      password: options.password,
-    });
-
-    const session = getCookieValue(
-      loginResponse.headers['set-cookie'] || [],
-      'session'
-    );
-    SQL.session = session;
-    Projects.session = session;
+    try {
+      await httpAuthenticator.authenticate(
+        httpClient,
+        options.user,
+        options.password
+      );
+    } catch (error) {
+      throw MindsDbError.fromHttpError(error, baseURL);
+    }
   }
 };
 

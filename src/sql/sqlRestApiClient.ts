@@ -1,4 +1,4 @@
-import { Axios, AxiosError } from 'axios';
+import { Axios } from 'axios';
 
 import SqlApiClient from './sqlApiClient';
 import Constants from '../constants';
@@ -6,6 +6,7 @@ import SqlApiResponse from './sqlApiResponse';
 import SqlQueryResult from './sqlQueryResult';
 import { getBaseRequestConfig } from '../util/http';
 import { MindsDbError } from '../errors';
+import HttpAuthenticator from '../httpAuthenticator';
 
 /**
  * Class to perform SQL operations through the REST API.
@@ -15,16 +16,17 @@ export default class SqlRestApiClient extends SqlApiClient {
   /** Axios instance to send all requests. */
   client: Axios;
 
-  /** Session used for authentication. Used only for Cloud host. */
-  session: string | undefined;
+  /** Authenticator to use for reauthenticating if needed. */
+  authenticator: HttpAuthenticator;
 
   /**
    *
    * @param {Axios} client - Axios instance used for all requests.
    */
-  constructor(client: Axios) {
+  constructor(client: Axios, authenticator: HttpAuthenticator) {
     super();
     this.client = client;
+    this.authenticator = authenticator;
   }
 
   /**
@@ -81,22 +83,18 @@ export default class SqlRestApiClient extends SqlApiClient {
     const queryRequest = {
       query,
     };
-    const { session, client } = this;
+    const { authenticator, client } = this;
+    const queryUrl = this.getQueryUrl();
     try {
       const queryResponse = await client.post(
-        this.getQueryUrl(),
+        queryUrl,
         queryRequest,
-        getBaseRequestConfig(session)
+        getBaseRequestConfig(authenticator)
       );
       const responseData: SqlApiResponse = queryResponse.data;
       return this.makeQueryResult(responseData);
     } catch (error) {
-      if (error instanceof AxiosError) {
-        throw MindsDbError.fromAxiosError(error);
-      }
-      throw new MindsDbError(
-        `Something went wrong handling HTTP POST request to ${this.getQueryUrl()}: ${error}`
-      );
+      throw MindsDbError.fromHttpError(error, queryUrl);
     }
   }
 }
