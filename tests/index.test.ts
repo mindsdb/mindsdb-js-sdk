@@ -37,12 +37,12 @@ describe('Testing root SDK functions', () => {
       password: 'test-password',
     });
 
-    expect(MindsDB.SQL.session).toEqual('test-session');
+    expect(MindsDB.SQL.authenticator.session).toEqual('test-session');
   });
 
   test('connect should not authenticate for custom endpoint', async () => {
-    mockedAxios.defaults.baseURL = 'https://test-url.com';
     await MindsDB.connect({
+      host: 'https://test-url.com',
       user: 'test-user',
       password: 'test-password',
       httpClient: mockedAxios,

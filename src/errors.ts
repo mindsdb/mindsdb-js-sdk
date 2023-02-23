@@ -79,6 +79,20 @@ class MindsDbError extends Error {
     }
     return new MindsDbError(axiosError.message);
   }
+
+  /**
+   * Creates a MindsDB error from an error thrown during an HTTP request, with a more readable error message.
+   * @param {AxiosError} axiosError - Original HTTP Error
+   * @returns {MindsDbError} - New MindsDB error.
+   */
+  static fromHttpError(error: unknown, url: string): MindsDbError {
+    if (error instanceof AxiosError) {
+      return MindsDbError.fromAxiosError(error);
+    }
+    return new MindsDbError(
+      `Something went wrong handling HTTP POST request to ${url}: ${error}`
+    );
+  }
 }
 
 export { MindsDbError };
