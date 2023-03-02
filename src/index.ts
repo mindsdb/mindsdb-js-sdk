@@ -3,7 +3,6 @@ import DatabasesModule from './databases/databasesModule';
 import ProjectsModule from './projects/projectsModule';
 import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
-import ConnectionOptions from './connectionOptions';
 import Constants from './constants';
 import {
   createDefaultAxiosInstance,
@@ -12,8 +11,24 @@ import {
 } from './util/http';
 import TablesModule from './tables/tablesModule';
 import HttpAuthenticator from './httpAuthenticator';
-import { MindsDbError } from './errors';
 import { Axios } from 'axios';
+
+// For type declarations.
+import ConnectionOptions from './connectionOptions';
+import Database from './databases/database';
+import {
+  Model,
+  ModelFeatureDescription,
+  ModelPrediction,
+} from './models/model';
+import { MindsDbError } from './errors';
+import { BatchQueryOptions, QueryOptions } from './models/queryOptions';
+import { AdjustOptions, TrainingOptions } from './models/trainingOptions';
+import Project from './projects/project';
+import SqlQueryResult from './sql/sqlQueryResult';
+import Table from './tables/table';
+import { JsonPrimitive, JsonValue } from './util/json';
+import View from './views/view';
 
 const defaultAxiosInstance = createDefaultAxiosInstance();
 const httpAuthenticator = new HttpAuthenticator();
@@ -70,3 +85,21 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
 };
 
 export default { connect, SQL, Databases, Models, Projects, Tables, Views };
+export {
+  ConnectionOptions,
+  Database,
+  Model,
+  ModelFeatureDescription,
+  ModelPrediction,
+  MindsDbError,
+  BatchQueryOptions,
+  QueryOptions,
+  AdjustOptions,
+  TrainingOptions,
+  Project,
+  SqlQueryResult,
+  Table,
+  JsonPrimitive,
+  JsonValue,
+  View,
+};

@@ -13,9 +13,9 @@ If you haven't already, make sure to [create a MindsDB account](https://cloud.mi
 
 ```npm install --save mindsdb-js-sdk```
 
-We have full TypeScript support.
+We have full TypeScript support. Just import the types you need directly. For example:
 
-```npm install ---save @types/mindsdb-js-sdk```
+```import { Database, Model, ModelPrediction, Project, Table, View } from 'mindsdb-js-sdk';```
 
 ## Usage Examples
 
