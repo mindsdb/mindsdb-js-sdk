@@ -200,17 +200,15 @@ class Model {
 
   /**
    * Retrains this model with the given options.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when retraining the model.
    * @throws {MindsDbError} - Something went wrong retraining this model.
    */
-  retrain(integration?: string, options?: TrainingOptions): Promise<void> {
-    if (integration && options) {
+  retrain(options?: TrainingOptions): Promise<void> {
+    if (options) {
       return this.modelsApiClient.retrainModel(
         this.name,
         this.targetColumn,
         this.project,
-        integration,
         options
       );
     }

@@ -33,12 +33,22 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     return `CREATE MODEL ${mysql.escapeId(project)}.${mysql.escapeId(name)}`;
   }
 
-  private makeTrainingFromClause(integration: string): string {
-    return `FROM ${mysql.escapeId(integration)}`;
+  private makeTrainingFromClause(options: TrainingOptions): string {
+    const integration = options['integration'];
+    if (integration) {
+      return `FROM ${mysql.escapeId(integration)}`;
+    }
+    return '';
   }
 
-  private makeTrainingSelectClause(select: string): string {
-    return `(${select})`;
+  private makeTrainingSelectClause(
+    options: TrainingOptions | AdjustOptions
+  ): string {
+    const select = options['select'];
+    if (select) {
+      return `(${select})`;
+    }
+    return '';
   }
 
   private makeTrainingPredictClause(targetColumn: string): string {
@@ -272,7 +282,6 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} targetColumn - Column for the model to predict.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when training the model.
    * @throws {MindsDbError} - Something went wrong querying the model.
    */
@@ -280,14 +289,11 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    integration: string,
     trainingOptions: TrainingOptions
   ): Promise<void> {
     const createClause = this.makeTrainingCreateClause(name, project);
-    const fromClause = this.makeTrainingFromClause(integration);
-    const selectClause = this.makeTrainingSelectClause(
-      trainingOptions['select']
-    );
+    const fromClause = this.makeTrainingFromClause(trainingOptions);
+    const selectClause = this.makeTrainingSelectClause(trainingOptions);
     const predictClause = this.makeTrainingPredictClause(targetColumn);
     const orderByClause = this.makeTrainingOrderByClause(trainingOptions);
     const groupByClause = this.makeTrainingGroupByClause(trainingOptions);
@@ -307,6 +313,8 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     ]
       .filter((s) => s)
       .join('\n');
+    console.log('training using query');
+    console.log(query);
     const sqlQueryResult = await this.sqlClient.runQuery(query);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
@@ -326,16 +334,13 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    integration?: string,
     trainingOptions?: TrainingOptions
   ): Promise<void> {
     const retrainClause = this.makeRetrainClause(name, project);
     let query = retrainClause;
-    if (integration && trainingOptions) {
-      const fromClause = this.makeTrainingFromClause(integration);
-      const selectClause = this.makeTrainingSelectClause(
-        trainingOptions['select']
-      );
+    if (trainingOptions) {
+      const fromClause = this.makeTrainingFromClause(trainingOptions);
+      const selectClause = this.makeTrainingSelectClause(trainingOptions);
       const predictClause = this.makeTrainingPredictClause(targetColumn);
       const orderByClause = this.makeTrainingOrderByClause(trainingOptions);
       const groupByClause = this.makeTrainingGroupByClause(trainingOptions);
@@ -379,7 +384,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const adjustClause = `ADJUST ${mysql.escapeId(project)}.${mysql.escapeId(
       name
     )} FROM ${mysql.escapeId(integration)}`;
-    const selectClause = this.makeTrainingSelectClause(adjustOptions['select']);
+    const selectClause = this.makeTrainingSelectClause(adjustOptions);
     const usingClause = this.makeTrainingUsingClause(adjustOptions);
     const query = [adjustClause, selectClause, usingClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(query);

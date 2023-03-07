@@ -78,7 +78,6 @@ export default abstract class ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} targetColumn - Column for the model to predict.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when training the model.
    * @throws {MindsDbError} - Something went wrong training the model.
    */
@@ -86,7 +85,6 @@ export default abstract class ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    integration: string,
     options: TrainingOptions
   ): Promise<void>;
 
@@ -95,7 +93,6 @@ export default abstract class ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} targetColumn - Column for the model to predict.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {TrainingOptions} options - Options to use when retraining the model.
    * @throws {MindsDbError} - Something went wrong retraining the model.
    */
@@ -103,7 +100,6 @@ export default abstract class ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    integration?: string,
     options?: TrainingOptions
   ): Promise<void>;
 

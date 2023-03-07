@@ -11,8 +11,10 @@ interface AdjustOptions {
 
 /** Structure of options to use when training a model. */
 interface TrainingOptions {
+  /** Integration name for the training data (e.g. mindsdb). */
+  integration?: string;
   /** SELECT SQL statement to use for selecting data. */
-  select: string;
+  select?: string;
 
   /** Column name to group by (for time series data only). */
   groupBy?: string;

@@ -292,8 +292,8 @@ LIMIT 3`;
       'my_test_model',
       'target_column',
       'my_test_project',
-      'my_integration',
       {
+        integration: 'my_integration',
         select: 'SELECT * FROM my_db.my_table',
         groupBy: 'group_col',
         orderBy: 'order_col',
@@ -341,8 +341,8 @@ USING
       'my_test_model',
       'target_column',
       'my_test_project',
-      'my_integration',
       {
+        integration: 'my_integration',
         select: 'SELECT * FROM my_db.my_table',
         groupBy: 'group_col',
         orderBy: 'order_col',
