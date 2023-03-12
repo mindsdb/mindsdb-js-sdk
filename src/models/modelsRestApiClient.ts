@@ -250,8 +250,8 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const selectClause = `SELECT m.${mysql.escapeId(
       targetColumn
     )} AS predicted, t.*, m.*`;
-    const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
     const joinId = options['join'];
+    const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
     const joinClause = `JOIN ${mysql.escapeId(project)}.${mysql.escapeId(
       name
     )} AS m`;
