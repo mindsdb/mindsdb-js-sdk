@@ -249,12 +249,12 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   ): Promise<Array<ModelPrediction>> {
     const selectClause = `SELECT m.${mysql.escapeId(
       targetColumn
-    )} AS predicted, m.*, t.*`;
-    const fromClause = `FROM ${mysql.escapeId(project)}.${mysql.escapeId(
+    )} AS predicted, t.*, m.*`;
+    const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
+    const joinId = options['join'];
+    const joinClause = `JOIN ${mysql.escapeId(project)}.${mysql.escapeId(
       name
     )} AS m`;
-    const joinId = options['join'];
-    const joinClause = `JOIN ${mysql.escapeId(joinId)} AS t`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const limitClause = options['limit']
       ? `LIMIT ${mysql.escape(options['limit'])}`
