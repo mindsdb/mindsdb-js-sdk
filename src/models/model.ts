@@ -177,6 +177,7 @@ class Model {
   query(options: QueryOptions): Promise<ModelPrediction> {
     return this.modelsApiClient.queryModel(
       this.name,
+      this.version
       this.targetColumn,
       this.project,
       options
@@ -192,6 +193,7 @@ class Model {
   batchQuery(options: BatchQueryOptions): Promise<Array<ModelPrediction>> {
     return this.modelsApiClient.batchQueryModel(
       this.name,
+      this.version,
       this.targetColumn,
       this.project,
       options
