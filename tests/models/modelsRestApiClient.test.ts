@@ -208,6 +208,7 @@ describe('Testing Models REST API client', () => {
     const actualPrediction =
       (await modelsRestApiClient.queryModel(
         'my_test_model',
+        1,
         'target_column',
         'my_test_project',
         {
@@ -216,7 +217,7 @@ describe('Testing Models REST API client', () => {
       )) || ({} as ModelPrediction);
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `SELECT * FROM \`my_test_project\`.\`my_test_model\`
+    const expectedQuery = `SELECT * FROM \`my_test_project\`.\`my_test_model\`.1
 WHERE field1 = val1
 AND field2 = val2`;
     expect(actualQuery).toEqual(expectedQuery);
@@ -248,6 +249,7 @@ AND field2 = val2`;
 
     const actualPredictions = await modelsRestApiClient.batchQueryModel(
       'my_test_model',
+      1,
       'target_column',
       'my_test_project',
       {
@@ -258,9 +260,9 @@ AND field2 = val2`;
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `SELECT m.\`target_column\` AS predicted, m.*, t.*
-FROM \`my_test_project\`.\`my_test_model\` AS m
-JOIN \`my_db\`.\`my_table\` AS t
+    const expectedQuery = `SELECT m.\`target_column\` AS predicted, t.*, m.*
+FROM \`my_db\`.\`my_table\` AS t
+JOIN \`my_test_project\`.\`my_test_model\`.1 AS m
 WHERE t.field1 = val1
 AND t.field2 = val2
 LIMIT 3`;

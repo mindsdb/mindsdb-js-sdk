@@ -177,7 +177,7 @@ class Model {
   query(options: QueryOptions): Promise<ModelPrediction> {
     return this.modelsApiClient.queryModel(
       this.name,
-      this.version
+      this.version,
       this.targetColumn,
       this.project,
       options
