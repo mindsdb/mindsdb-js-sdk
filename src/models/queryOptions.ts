@@ -8,6 +8,9 @@ interface QueryOptions {
    * Example: ['t.field1 = val1', 't.field2 = val2'] joins against source data where field1 = val1 and field2 = val2.
    */
   where?: string | Array<string>;
+  
+  /** The model's version to query against */
+  version?: number;
 }
 
 /** Structure of options to use when making a batch prediction. */
