@@ -212,13 +212,14 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    */
   override async queryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: QueryOptions
   ): Promise<ModelPrediction> {
     const selectClause = `SELECT * FROM ${mysql.escapeId(
       project
-    )}.${mysql.escapeId(name)}.${}`;
+    )}.${mysql.escapeId(name)}.${version}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const selectQuery = [selectClause, whereClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
@@ -245,6 +246,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    */
   override async batchQueryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: BatchQueryOptions
@@ -256,7 +258,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
     const joinClause = `JOIN ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )} AS m`;
+    )}.${version} AS m`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const limitClause = options['limit']
       ? `LIMIT ${mysql.escape(options['limit'])}`
