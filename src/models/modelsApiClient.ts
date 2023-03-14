@@ -52,6 +52,7 @@ export default abstract class ModelsApiClient {
    */
   abstract queryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: QueryOptions
@@ -68,6 +69,7 @@ export default abstract class ModelsApiClient {
    */
   abstract batchQueryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: BatchQueryOptions
