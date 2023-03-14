@@ -133,15 +133,17 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Gets a model by name and project.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {number} version - The version of the model.
    * @returns {Promise<Model | undefined>} - The matching model, or undefined if none exists.
    */
   override async getModel(
     name: string,
-    project: string
+    project: string,
+    version?: number,
   ): Promise<Model | undefined> {
     const selectQuery = `SELECT * FROM ${mysql.escapeId(
       project
-    )}.models WHERE name = ${mysql.escape(name)}`;
+    )}.models${version ? '_versions' : ''} WHERE name = ${mysql.escape(name)}${version ? ` and version = ${mysql.escape(version)}` : ''}`;
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.rows?.length === 0) {
       return undefined;
@@ -210,13 +212,14 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    */
   override async queryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: QueryOptions
   ): Promise<ModelPrediction> {
     const selectClause = `SELECT * FROM ${mysql.escapeId(
       project
-    )}.${mysql.escapeId(name)}`;
+    )}.${mysql.escapeId(name)}.${version}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const selectQuery = [selectClause, whereClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
@@ -243,6 +246,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    */
   override async batchQueryModel(
     name: string,
+    version: number,
     targetColumn: string,
     project: string,
     options: BatchQueryOptions
@@ -254,7 +258,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
     const joinClause = `JOIN ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )} AS m`;
+    )}.${version} AS m`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const limitClause = options['limit']
       ? `LIMIT ${mysql.escape(options['limit'])}`
