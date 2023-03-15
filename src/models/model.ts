@@ -3,9 +3,8 @@ import ModelsApiClient from './modelsApiClient';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { AdjustOptions, TrainingOptions } from './trainingOptions';
 
-
 /** Status of a model being up to date or not. */
-type UpdateStatus = 'available' | 'updating' | 'up_to_date'
+type UpdateStatus = 'available' | 'updating' | 'up_to_date';
 
 /**
  * Structure of a row returned from the MindsDB model database via the SQL query API.
@@ -39,6 +38,9 @@ interface ModelRow {
 
   /** User assigned model tag. */
   tag?: string;
+
+  /** Whether the model is active or not. */
+  active: boolean;
 }
 
 interface ModelFeatureDescription {
@@ -117,6 +119,9 @@ class Model {
   /** User assigned model tag. */
   tag?: string;
 
+  /** Whether the model is active or not. */
+  active?: boolean;
+
   /**
    * Constructor not to be used directly.
    *
@@ -139,7 +144,8 @@ class Model {
     updateStatus: UpdateStatus,
     version: number,
     accuracy?: number,
-    tag?: string
+    tag?: string,
+    active?: boolean
   ) {
     this.modelsApiClient = modelsApiClient;
     this.name = name;
@@ -150,6 +156,7 @@ class Model {
     this.version = version;
     this.accuracy = accuracy;
     this.tag = tag;
+    this.active = active;
   }
 
   /**
@@ -252,7 +259,8 @@ class Model {
       obj['update_status'],
       obj['version'],
       obj['accuracy'],
-      obj['tag']
+      obj['tag'],
+      obj['active'],
     );
   }
 }
