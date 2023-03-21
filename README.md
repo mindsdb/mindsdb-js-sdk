@@ -161,7 +161,8 @@ See [full query options docs](https://mindsdb.github.io/mindsdb-js-sdk/interface
 Simple queries:
 ```typescript
 const regressionTrainingOptions = {
-  select: 'SELECT * FROM demo_data.home_rentals'
+  select: 'SELECT * FROM demo_data.home_rentals',
+  integration: 'example_db'
 };
 
 try {
@@ -172,7 +173,6 @@ try {
     'home_rentals_model',
     'rental_price',
     'mindsdb',
-    'example_db',
     regressionTrainingOptions);
 
   // Wait for the training to be complete. This is just a simple example. There are much better ways to do this.
@@ -202,6 +202,7 @@ A more complex example using batch querying:
 
 ```typescript
 const timeSeriesTrainingOptions = {
+  integration: 'example_db',
   select: 'SELECT * FROM demo_data.house_sales',
   orderBy: 'saledate',
   groupBy: 'bedrooms',
@@ -227,7 +228,6 @@ try {
     'house_sales_model',
     'rental_price',
     'mindsdb',
-    'example_db',
     timeSeriesTrainingOptions);
 
   // Wait for training to be complete...
@@ -293,8 +293,7 @@ const params = { 'key' : 'value' }
 try {
   // Does NOT block on adjusting. The promise resolves after adjusting starts.
   await homeRentalPriceModel.adjust(
-    'example_db',
-    { select: adjustSelect, using: params });
+    { integration: 'example_db', select: adjustSelect, using: params });
 } catch (error) {
   // Something went wrong adjusting.
 }
