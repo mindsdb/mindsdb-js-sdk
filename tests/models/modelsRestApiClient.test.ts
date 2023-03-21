@@ -391,9 +391,9 @@ USING
     await modelsRestApiClient.adjustModel(
       'my_test_model',
       'my_test_project',
-      'my_integration',
       {
         select: 'SELECT * FROM my_db.my_table',
+        integration: 'my_integration',
         using: {
           tag: 'test-tag',
           labels: ['test-label'],

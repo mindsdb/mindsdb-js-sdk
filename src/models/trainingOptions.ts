@@ -2,6 +2,8 @@ import { JsonValue } from '../util/json';
 
 /** Structure of options to use when adjusting a model.  */
 interface AdjustOptions {
+  /** Integration name for the training data (e.g. mindsdb). */
+  integration: string;
   /** SELECT SQL statement to use for selecting data. */
   select: string;
 

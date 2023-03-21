@@ -375,19 +375,17 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Partially adjusts this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {string} integration - Integration name for the training data (e.g. mindsdb).
    * @param {AdjustOptions} options - Options to use when adjusting the model.
    * @throws {MindsDbError} - Something went wrong querying the model.
    */
   override async adjustModel(
     name: string,
     project: string,
-    integration: string,
     adjustOptions: AdjustOptions
   ): Promise<void> {
     const adjustClause = `ADJUST ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )} FROM ${mysql.escapeId(integration)}`;
+    )} FROM ${mysql.escapeId(adjustOptions['integration'])}`;
     const selectClause = this.makeTrainingSelectClause(adjustOptions);
     const usingClause = this.makeTrainingUsingClause(adjustOptions);
     const query = [adjustClause, selectClause, usingClause].join('\n');

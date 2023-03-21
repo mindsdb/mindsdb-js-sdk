@@ -238,7 +238,6 @@ class Model {
     return this.modelsApiClient.adjustModel(
       this.name,
       this.project,
-      integration,
       options
     );
   }
