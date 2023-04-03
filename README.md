@@ -46,7 +46,8 @@ try {
   await MindsDB.connect({
     host: 'http://<YOUR_INSTANCE_IP>',
     user: 'mindsdbuser@gmail.com',
-    password: 'mypassword'
+    password: 'mypassword',
+    managed: true
   });
 } catch(error) {
   // Failed to authenticate.
