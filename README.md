@@ -30,8 +30,23 @@ import MindsDB from 'mindsdb-js-sdk';
 
 try {
   await MindsDB.connect({
-    user: mindsdbuser@gmail.com,
-    password: mypassword
+    user: 'mindsdbuser@gmail.com',
+    password: 'mypassword'
+  });
+} catch(error) {
+  // Failed to authenticate.
+}
+```
+
+MindsDB Pro:
+```typescript
+import MindsDB from 'mindsdb-js-sdk';
+
+try {
+  await MindsDB.connect({
+    host: 'http://<YOUR_INSTANCE_IP>',
+    user: 'mindsdbuser@gmail.com',
+    password: 'mypassword'
   });
 } catch(error) {
   // Failed to authenticate.
@@ -45,7 +60,7 @@ import MindsDB from 'mindsdb-js-sdk';
 try {
   // No authentication needed for self-hosting
   await MindsDB.connect({
-    host: '127.0.0.1:47334'
+    host: 'http://127.0.0.1:47334'
   });
 } catch(error) {
   // Failed to connect to local instance.
