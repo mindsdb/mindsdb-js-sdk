@@ -13,6 +13,9 @@ export default class HttpAuthenticator {
   /** MindsDB password used for authentication. */
   password = '';
 
+  /** MindsDb managed instance */
+  managed = false;
+
   /**
    * Logs into MindsDB Cloud and stores the returned session.
    * @param {Axios} axiosClient - Axios instance to use when sending login request.
@@ -22,15 +25,21 @@ export default class HttpAuthenticator {
   async authenticate(
     axiosClient: Axios,
     user: string,
-    password: string
+    password: string,
+    managed?: boolean
   ): Promise<void> {
     this.user = user;
     this.password = password;
+    this.managed = managed || false;
     const baseURL =
       axiosClient.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
-    const loginURL = new URL(Constants.BASE_LOGIN_URI, baseURL);
+    const loginURL = new URL(
+      managed ? Constants.BASE_MANAGED_LOGIN_URI : Constants.BASE_LOGIN_URI,
+      baseURL
+    );
     const loginResponse = await axiosClient.post(loginURL.href, {
       email: this.user,
+      username: this.user,
       password: this.password,
     });
     this.session = getCookieValue(
@@ -63,7 +72,12 @@ export default class HttpAuthenticator {
       return false;
     }
     console.info('MindsDB HTTP session expired. Reauthenticating...');
-    await this.authenticate(axiosClient, this.user, this.password);
+    await this.authenticate(
+      axiosClient,
+      this.user,
+      this.password,
+      this.managed
+    );
     console.info('Successfully reauthenticated.');
     return true;
   }

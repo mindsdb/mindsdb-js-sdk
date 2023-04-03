@@ -15,6 +15,11 @@ export default interface ConnectionOptions {
    */
   host?: string;
 
+  /** Is it a managed instance?
+   * Defaults to false.
+   */
+  managed?: boolean,
+
   /**
    * Custom Axios client to use for sending API requests.
    */

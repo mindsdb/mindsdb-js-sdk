@@ -8,6 +8,9 @@ export default class Constants {
   /** MindsDB Cloud login endpoint. */
   public static readonly BASE_LOGIN_URI = '/cloud/login';
 
+  /** MindsDB managed login endpoint. */
+  public static readonly BASE_MANAGED_LOGIN_URI = '/api/login';
+
   /** MindsDB SQL query endpoint. */
   public static readonly BASE_SQL_URI = '/api/sql/query';
 

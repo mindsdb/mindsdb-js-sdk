@@ -76,7 +76,8 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
       await httpAuthenticator.authenticate(
         httpClient,
         options.user,
-        options.password
+        options.password,
+        options.managed
       );
     } catch (error) {
       throw MindsDbError.fromHttpError(error, baseURL);
