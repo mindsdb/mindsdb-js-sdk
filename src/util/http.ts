@@ -77,7 +77,7 @@ function getCookieValue(
 
 /**
  * Determines whether or not the given URL is for MindsDB Cloud or not.
- * @param {string} - URL to test.url
+ * @param {string} - URL to test.
  * @returns {boolean} - Whether or not the URL is a Cloud endpoint.
  */
 function isMindsDbCloudEndpoint(url: string): boolean {
@@ -86,6 +86,15 @@ function isMindsDbCloudEndpoint(url: string): boolean {
   // - https://alpha.mindsdb.com
   // - https://beta.mindsdb.com
   return url.includes('mindsdb.com');
+}
+
+/**
+ * Determines whether or not the given URL is a local URL.
+ * @param {string} - URL to test.
+ * @returns {boolean} - Whether or not the URL is a local endpoint.
+ */
+function isLocalEndpoint(url: string): boolean {
+  return url.includes('localhost') || url.includes('127.0.0.1');
 }
 
 /**
@@ -123,6 +132,7 @@ export {
   createDefaultAxiosInstance,
   getBaseRequestConfig,
   getCookieValue,
+  isLocalEndpoint,
   isMindsDbCloudEndpoint,
   retryUnauthenticatedRequest,
 };

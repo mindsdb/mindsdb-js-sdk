@@ -6,6 +6,7 @@ import ViewsModule from './views/viewsModule';
 import Constants from './constants';
 import {
   createDefaultAxiosInstance,
+  isLocalEndpoint,
   isMindsDbCloudEndpoint,
   retryUnauthenticatedRequest,
 } from './util/http';
@@ -71,7 +72,7 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   const baseURL =
     httpClient.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
   // Need to authenticate if we're using the Cloud API endpoints.
-  if (isMindsDbCloudEndpoint(baseURL)) {
+  if (isMindsDbCloudEndpoint(baseURL) || !isLocalEndpoint(baseURL)) {
     try {
       await httpAuthenticator.authenticate(
         httpClient,
