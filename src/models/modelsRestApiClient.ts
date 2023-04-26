@@ -229,7 +229,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const predictionRow = sqlQueryResult.rows[0];
     const prediction = {
       value: predictionRow[targetColumn],
-      explain: JSON.parse(predictionRow[`${targetColumn}_explain`] || '{}'),
+      explain: predictionRow[`${targetColumn}_explain`],
       data: predictionRow,
     };
     return prediction;
@@ -276,7 +276,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     }
     return sqlQueryResult.rows.map((r) => ({
       value: r['predicted'],
-      explain: JSON.parse(r[`${targetColumn}_explain`] || '{}'),
+      explain: r[`${targetColumn}_explain`],
       data: r,
     }));
   }
@@ -317,8 +317,6 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     ]
       .filter((s) => s)
       .join('\n');
-    console.log('training using query');
-    console.log(query);
     const sqlQueryResult = await this.sqlClient.runQuery(query);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
