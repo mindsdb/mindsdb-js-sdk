@@ -88,7 +88,7 @@ export default abstract class ModelsApiClient {
     targetColumn: string,
     project: string,
     options: TrainingOptions
-  ): Promise<void>;
+  ): Promise<Model>;
 
   /**
    * Rerains this model with the given options.

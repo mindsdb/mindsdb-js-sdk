@@ -123,7 +123,7 @@ class Model {
   active?: boolean;
 
   /**
-   * Constructor not to be used directly.
+   * Constructor.
    *
    * @param {ModelsApiClient} modelsApiClient
    * @param {string} name - Name of the model.
@@ -135,7 +135,7 @@ class Model {
    * @param {number} [accuracy] - Accuracy of model predictions between 0 and 1.
    * @param {string} [tag] - User assigned model tag.
    */
-  private constructor(
+  constructor(
     modelsApiClient: ModelsApiClient,
     name: string,
     project: string,
@@ -235,11 +235,7 @@ class Model {
    * @throws {MindsDbError} - Something went wrong adjusting this model.
    */
   adjust(integration: string, options: AdjustOptions): Promise<void> {
-    return this.modelsApiClient.adjustModel(
-      this.name,
-      this.project,
-      options
-    );
+    return this.modelsApiClient.adjustModel(this.name, this.project, options);
   }
 
   /**
@@ -259,7 +255,7 @@ class Model {
       obj['version'],
       obj['accuracy'],
       obj['tag'],
-      obj['active'],
+      obj['active']
     );
   }
 }

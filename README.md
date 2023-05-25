@@ -192,7 +192,7 @@ try {
     regressionTrainingOptions);
 
   // Wait for the training to be complete. This is just a simple example. There are much better ways to do this.
-  while (homeRentalPriceModel.status === 'training') {
+  while (homeRentalPriceModel.status !== 'complete' && homeRentalPriceModel.status !== 'error') {
     homeRentalPriceModel = await MindsDB.Models.getModel('home_rentals_model', 'mindsdb');
   }
 

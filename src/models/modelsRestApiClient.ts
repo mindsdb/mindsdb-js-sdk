@@ -139,11 +139,13 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   override async getModel(
     name: string,
     project: string,
-    version?: number,
+    version?: number
   ): Promise<Model | undefined> {
-    const selectQuery = `SELECT * FROM ${mysql.escapeId(
-      project
-    )}.models${version ? '_versions' : ''} WHERE name = ${mysql.escape(name)}${version ? ` and version = ${mysql.escape(version)}` : ''}`;
+    const selectQuery = `SELECT * FROM ${mysql.escapeId(project)}.models${
+      version ? '_versions' : ''
+    } WHERE name = ${mysql.escape(name)}${
+      version ? ` and version = ${mysql.escape(version)}` : ''
+    }`;
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.rows?.length === 0) {
       return undefined;
@@ -294,7 +296,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     targetColumn: string,
     project: string,
     trainingOptions: TrainingOptions
-  ): Promise<void> {
+  ): Promise<Model> {
     const createClause = this.makeTrainingCreateClause(name, project);
     const fromClause = this.makeTrainingFromClause(trainingOptions);
     const selectClause = this.makeTrainingSelectClause(trainingOptions);
@@ -321,6 +323,15 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
+    return new Model(
+      this,
+      name,
+      project,
+      targetColumn,
+      'generating',
+      'up_to_date',
+      1
+    );
   }
 
   /**
