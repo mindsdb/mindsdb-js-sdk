@@ -30,6 +30,7 @@ import SqlQueryResult from './sql/sqlQueryResult';
 import Table from './tables/table';
 import { JsonPrimitive, JsonValue } from './util/json';
 import View from './views/view';
+import MLEnginesModule from './ml_engines/ml_enginesModule';
 
 const defaultAxiosInstance = createDefaultAxiosInstance();
 const httpAuthenticator = new HttpAuthenticator();
@@ -46,6 +47,7 @@ const Projects = new ProjectsModule.ProjectsRestApiClient(
 );
 const Tables = new TablesModule.TablesRestApiClient(SQL);
 const Views = new ViewsModule.ViewsRestApiClient(SQL);
+const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(SQL, defaultAxiosInstance, httpAuthenticator);
 
 const getAxiosInstance = function (options: ConnectionOptions): Axios {
   const httpClient = options.httpClient || defaultAxiosInstance;
@@ -86,7 +88,7 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   }
 };
 
-export default { connect, SQL, Databases, Models, Projects, Tables, Views };
+export default { connect, SQL, Databases, Models, Projects, Tables, Views, MLEngines };
 export {
   ConnectionOptions,
   Database,
