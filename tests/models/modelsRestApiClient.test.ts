@@ -168,6 +168,95 @@ describe('Testing Models REST API client', () => {
     expect(actualModelDescriptions[1].role).toEqual('my_role2');
   });
 
+  test('should describe model accuracy', async () => {
+    const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
+    const date = new Date().toISOString();
+    const expectedModelDescriptions = [
+      {
+        unique_id: '1',
+        cutoff: date,
+        metric: 'mae',
+        NHITS_random: 'my_role1',
+      },
+      {
+        unique_id: '2',
+        cutoff: date,
+        metric: 'mae',
+        NHITS_random: 'my_role2',
+      },
+    ];
+    mockedSqlRestApiClient.runQuery.mockImplementation(() => {
+      return Promise.resolve({
+        columnNames: [],
+        context: {
+          db: 'mindsdb',
+        },
+        type: 'ok',
+        rows: expectedModelDescriptions,
+      });
+    });
+
+    const actualModelDescriptions = await modelsRestApiClient.describeAccuracyModel(
+      'my_test_model',
+      'my_test_project'
+    );
+
+    const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.accuracy`;
+    expect(actualQuery).toEqual(expectedQuery);
+
+    expect(actualModelDescriptions[0].unique_id).toEqual('1');
+    expect(actualModelDescriptions[0].metric).toEqual('mae');
+    expect(actualModelDescriptions[0].cutoff).toEqual(date);
+    expect(actualModelDescriptions[0].NHITS_random).toEqual('my_role1');
+
+    expect(actualModelDescriptions[1].unique_id).toEqual('2');
+    expect(actualModelDescriptions[1].metric).toEqual('mae');
+    expect(actualModelDescriptions[1].cutoff).toEqual(date);
+    expect(actualModelDescriptions[1].NHITS_random).toEqual('my_role2');
+  });
+
+
+  test('should describe model accuracy for unique_id', async () => {
+    const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
+    const date = new Date().toISOString();
+    const expectedModelDescriptions = [
+      {
+        unique_id: '1',
+        cutoff: date,
+        metric: 'mae',
+        NHITS_random: 'my_role1',
+      },
+    ];
+    mockedSqlRestApiClient.runQuery.mockImplementation(() => {
+      return Promise.resolve({
+        columnNames: [],
+        context: {
+          db: 'mindsdb',
+        },
+        type: 'ok',
+        rows: expectedModelDescriptions,
+      });
+    });
+
+    const actualModelDescriptions = await modelsRestApiClient.describeAccuracyModel(
+      'my_test_model',
+      'my_test_project',
+      '1'
+    );
+
+    const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.accuracy.\`1\``;
+    expect(actualQuery).toEqual(expectedQuery);
+
+    expect(actualModelDescriptions[0].unique_id).toEqual('1');
+    expect(actualModelDescriptions[0].metric).toEqual('mae');
+    expect(actualModelDescriptions[0].cutoff).toEqual(date);
+    expect(actualModelDescriptions[0].NHITS_random).toEqual('my_role1');
+    expect(actualModelDescriptions.length).toEqual(1);
+
+  });
+
   test('should delete model', async () => {
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
@@ -192,7 +281,7 @@ describe('Testing Models REST API client', () => {
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
     const predictionRow = {
       target_column: 'prediction_value',
-      target_column_explain: '{"confidence": 0.75}',
+      target_column_explain: {"confidence": 0.75},
     };
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
@@ -231,7 +320,7 @@ AND field2 = val2`;
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
     const predictionRow1 = {
       predicted: 'prediction_value1',
-      target_column_explain: '{"confidence": 0.75}',
+      target_column_explain: {"confidence": 0.75},
     };
     const predictionRow2 = {
       predicted: 'prediction_value2',
@@ -273,7 +362,7 @@ LIMIT 3`;
     expect(actualPredictions[0].data).toMatchObject(predictionRow1);
 
     expect(actualPredictions[1].value).toEqual('prediction_value2');
-    expect(actualPredictions[1].explain).toMatchObject({});
+    expect(actualPredictions[1].explain).toBeUndefined();
     expect(actualPredictions[1].data).toMatchObject(predictionRow2);
   });
 

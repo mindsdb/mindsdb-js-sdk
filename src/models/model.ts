@@ -85,6 +85,13 @@ interface ModelPrediction {
   data: object;
 }
 
+interface ModelDescribeAccuracy {
+  unique_id: string;
+  cutoff: Date;
+  metric: string;
+  [key: string]: unknown;
+}
+
 /**
  * Represents a MindsDB model and all supported operations.
  */
@@ -165,6 +172,15 @@ class Model {
    */
   describe(): Promise<Array<ModelFeatureDescription>> {
     return this.modelsApiClient.describeModel(this.name, this.project);
+  }
+
+  /**
+   * Describes the accuracy of this model.
+   * @param {string} unique_id - Optional unique id to filter the accuracy by.
+   * @returns {Array<ModelDescribeAccuracy>} - The accuracy of the model.
+   */
+  describeAccuracy(unique_id?: string): Promise<Array<ModelDescribeAccuracy>> {
+    return this.modelsApiClient.describeAccuracyModel(this.name, this.project, unique_id);
   }
 
   /**
@@ -260,4 +276,4 @@ class Model {
   }
 }
 
-export { Model, ModelFeatureDescription, ModelPrediction, ModelRow };
+export { Model, ModelFeatureDescription, ModelPrediction, ModelRow, ModelDescribeAccuracy };

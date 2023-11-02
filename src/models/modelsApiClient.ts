@@ -1,4 +1,4 @@
-import { Model, ModelFeatureDescription, ModelPrediction } from './model';
+import { Model, ModelDescribeAccuracy, ModelFeatureDescription, ModelPrediction } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { AdjustOptions, TrainingOptions } from './trainingOptions';
 
@@ -31,6 +31,19 @@ export default abstract class ModelsApiClient {
     name: string,
     project: string
   ): Promise<Array<ModelFeatureDescription>>;
+
+  /**
+   * Describes the features of this model.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   * @param {string} unique_id - Optional unique id to filter the accuracy by.
+   * @returns {Array<ModelDescribeAccuracy>} - All feature descriptions of the model. Empty if the model doesn't exist.
+   */
+  abstract describeAccuracyModel(
+    name: string,
+    project: string,
+    unique_id?: string
+  ): Promise<Array<ModelDescribeAccuracy>>;
 
   /**
    * Deletes this model.
