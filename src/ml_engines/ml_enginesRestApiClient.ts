@@ -46,14 +46,28 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   }
 
   /**
-   * Creates a mlEngine with the given name, engine, and parameters.
+   * Updates a mlEngine with the given name, engine, and parameters.
    * @param {string} name - Name of the MLEngine to be created.
    * @param {string} [codeFilePath] - Path to the code file ( path.join(__dirname, 'model.py'))
    * @param {string} [modulesFilePath] - Path to the modules file ( path.join(__dirname, 'requirements.txt'))
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
-  override async createMLEngine(
+  override async updateMLEngine(
+    name: string, // This is the variable that will be used in the URL
+    codeFilePath: string,
+    modulesFilePath: string
+  ): Promise<MLEngine | undefined> {
+    return this.createOrUpdateMLEngine(
+      'post',
+      name,
+      codeFilePath,
+      modulesFilePath
+    );
+  }
+
+  private async createOrUpdateMLEngine(
+    httpMethod: 'post' | 'put',
     name: string, // This is the variable that will be used in the URL
     codeFilePath: string,
     modulesFilePath: string
@@ -91,7 +105,7 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
 
     const config = getBaseRequestConfig(authenticator);
     const mlEngineUrl = this.getMLEnginesUrl();
-    config.method = 'put';
+    config.method = httpMethod;
     config.url = `${mlEngineUrl}/${encodeURIComponent(name)}`;
     (config.headers = {
       ...config.headers,
@@ -110,6 +124,27 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
       console.error(error);
       throw MindsDbError.fromHttpError(error, mlEngineUrl);
     }
+  }
+
+  /**
+   * Creates a mlEngine with the given name, engine, and parameters.
+   * @param {string} name - Name of the MLEngine to be created.
+   * @param {string} [codeFilePath] - Path to the code file ( path.join(__dirname, 'model.py'))
+   * @param {string} [modulesFilePath] - Path to the modules file ( path.join(__dirname, 'requirements.txt'))
+   * @returns {Promise<MLEngine>} - Newly created mlEngine.
+   * @throws {MindsDbError} - Something went wrong creating the mlEngine.
+   */
+  override async createMLEngine(
+    name: string, // This is the variable that will be used in the URL
+    codeFilePath: string,
+    modulesFilePath: string
+  ): Promise<MLEngine | undefined> {
+    return this.createOrUpdateMLEngine(
+      'put',
+      name,
+      codeFilePath,
+      modulesFilePath
+    );
   }
 
   // Usage example:
@@ -135,9 +170,7 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   override async getMLEngine(name: string): Promise<MLEngine | undefined> {
     const showMLEnginesQuery = `SHOW ML_ENGINES`;
     const sqlQueryResponse = await this.sqlClient.runQuery(showMLEnginesQuery);
-    const mlEngineRow = sqlQueryResponse.rows.find(
-      (r) => r['name'] === name
-    );
+    const mlEngineRow = sqlQueryResponse.rows.find((r) => r['name'] === name);
     if (!mlEngineRow) {
       return undefined;
     }
@@ -148,45 +181,6 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
       mlEngineRow['connection_data']
     );
   }
-
-  // /**
-  //  * Creates a mlEngine with the given name, engine, and parameters.
-  //  * @param {string} name - Name of the mlEngine to be created.
-  //  * @param {string} [engine] - Optional name of the mlEngine engine.
-  //  * @param {string} [params] - Optional parameters used to connect to the mlEngine (e.g. user, password).
-  //  * @returns {Promise<MLEngine>} - Newly created mlEngine.
-  //  * @throws {MindsDbError} - Something went wrong creating the mlEngine.
-  //  */
-  // override async createMLEngine(
-  //   name: string,
-  //   engine?: string,
-  //   params?: Record<string, JsonValue>
-  // ): Promise<MLEngine> {
-  //   // Can't use backtick quotes with CREATE DATABASE since it will be included
-  //   // in the information schema, but we still want to escape the name.
-  //   const escapedName = mysql.escapeId(name);
-  //   const escapedNameNoBackticks = escapedName.slice(1, escapedName.length - 1);
-  //   const createClause = `CREATE DATABASE ${escapedNameNoBackticks}`;
-  //   let engineClause = '';
-  //   let type = 'project';
-  //   if (engine) {
-  //     engineClause = `WITH ENGINE = ${mysql.escape(engine)}`;
-  //     type = 'data';
-  //   }
-  //   let paramsClause = '';
-  //   if (params) {
-  //     engineClause += ',';
-  //     paramsClause = `PARAMETERS = ${JSON.stringify(params)}`;
-  //   }
-  //   const createMLEngineQuery = [createClause, engineClause, paramsClause].join(
-  //     '\n'
-  //   );
-  //   const sqlQueryResult = await this.sqlClient.runQuery(createMLEngineQuery);
-  //   if (sqlQueryResult.error_message) {
-  //     throw new MindsDbError(sqlQueryResult.error_message);
-  //   }
-  //   return new MLEngine(this, name, type, engine);
-  // }
 
   /**
    * Deletes a mlEngine by name.

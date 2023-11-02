@@ -33,6 +33,20 @@ export default abstract class MLEnginesApiClient {
   ): Promise<MLEngine | undefined>;
 
   /**
+   * Updates a mlEngine with the given name, engine, and parameters.
+   * @param {string} name - Name of the mlEngine to be created.
+   * @param {string} [codeFilePath] - Path to the code file to be used for the mlEngine.
+   * @param {string} [modulesFilePath] - Path to the modules file to be used for the mlEngine.
+   * @returns {Promise<MLEngine>} - Newly created mlEngine.
+   * @throws {MindsDbError} - Something went wrong creating the mlEngine.
+   */
+  abstract updateMLEngine(
+    name: string,
+    codeFilePath: string,
+    modulesFilePath: string
+  ): Promise<MLEngine | undefined>;
+
+  /**
    * Deletes a mlEngine by name.
    * @param {string} name - Name of the mlEngine to be deleted.
    * @throws {MindsDbError} - Something went wrong deleting the mlEngine.
