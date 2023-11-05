@@ -10,6 +10,7 @@ import Constants from '../constants';
 import * as fs from 'fs';
 import FormData from 'form-data';
 import * as path from 'path'; // Import the path module
+import { Readable } from 'stream';
 import { getBaseRequestConfig } from '../util/http';
 
 /** Implementation of MLEnginesApiClient that goes through the REST API. */
@@ -48,15 +49,15 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   /**
    * Updates a mlEngine with the given name, engine, and parameters.
    * @param {string} name - Name of the MLEngine to be created.
-   * @param {string} [codeFilePath] - Path to the code file ( path.join(__dirname, 'model.py'))
-   * @param {string} [modulesFilePath] - Path to the modules file ( path.join(__dirname, 'requirements.txt'))
+   * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
+   * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
   override async updateMLEngine(
     name: string, // This is the variable that will be used in the URL
-    codeFilePath: string,
-    modulesFilePath: string
+    codeFilePath: string | Readable,
+    modulesFilePath: string | Readable
   ): Promise<MLEngine | undefined> {
     return this.createOrUpdateMLEngine(
       'post',
@@ -68,36 +69,50 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
 
   private async createOrUpdateMLEngine(
     httpMethod: 'post' | 'put',
-    name: string, // This is the variable that will be used in the URL
-    codeFilePath: string,
-    modulesFilePath: string
+    name: string,
+    codeFilePathOrStream: string | Readable,
+    modulesFilePathOrStream: string | Readable
   ): Promise<MLEngine | undefined> {
-    // Create form data
     const formData = new FormData();
 
-    // Append the 'source' part
     formData.append('source', name);
 
-    // Append the 'code' file part
-    if (fs.existsSync(codeFilePath)) {
-      // File exists, proceed with your operation
-      formData.append('code', fs.createReadStream(codeFilePath), {
-        filename: path.basename(codeFilePath), // The actual name of the file being read
+    // Append the 'code' file part, checking if it's a stream or a string
+    if (codeFilePathOrStream instanceof Readable) {
+      formData.append('code', codeFilePathOrStream, {
+        filename: 'model.py', // Provide an appropriate default filename or derive from context
         contentType: 'text/x-python-script',
       });
-    } else {
-      console.error('File does not exist:', codeFilePath);
+    } else if (typeof codeFilePathOrStream === 'string') {
+      if (fs.existsSync(codeFilePathOrStream)) {
+        formData.append('code', fs.createReadStream(codeFilePathOrStream), {
+          filename: path.basename(codeFilePathOrStream),
+          contentType: 'text/x-python-script',
+        });
+      } else {
+        console.error('File does not exist:', codeFilePathOrStream);
+      }
     }
 
-    // Append the 'modules' file part
-    if (fs.existsSync(modulesFilePath)) {
-      // File exists, proceed with your operation
-      formData.append('modules', fs.createReadStream(modulesFilePath), {
-        filename: path.basename(modulesFilePath), // The actual name of the file being read
+    // Append the 'modules' file part, checking if it's a stream or a string
+    if (modulesFilePathOrStream instanceof Readable) {
+      formData.append('modules', modulesFilePathOrStream, {
+        filename: 'requirements.txt', // Provide an appropriate default filename or derive from context
         contentType: 'text/plain',
       });
-    } else {
-      console.error('File does not exist:', modulesFilePath);
+    } else if (typeof modulesFilePathOrStream === 'string') {
+      if (fs.existsSync(modulesFilePathOrStream)) {
+        formData.append(
+          'modules',
+          fs.createReadStream(modulesFilePathOrStream),
+          {
+            filename: path.basename(modulesFilePathOrStream),
+            contentType: 'text/plain',
+          }
+        );
+      } else {
+        console.error('File does not exist:', modulesFilePathOrStream);
+      }
     }
 
     // Axios request configuration
@@ -129,15 +144,15 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   /**
    * Creates a mlEngine with the given name, engine, and parameters.
    * @param {string} name - Name of the MLEngine to be created.
-   * @param {string} [codeFilePath] - Path to the code file ( path.join(__dirname, 'model.py'))
-   * @param {string} [modulesFilePath] - Path to the modules file ( path.join(__dirname, 'requirements.txt'))
+   * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
+   * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
   override async createMLEngine(
     name: string, // This is the variable that will be used in the URL
-    codeFilePath: string,
-    modulesFilePath: string
+    codeFilePath: string | Readable,
+    modulesFilePath: string | Readable
   ): Promise<MLEngine | undefined> {
     return this.createOrUpdateMLEngine(
       'put',
@@ -189,7 +204,7 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   }
 
   private parseJson(json?: string): any {
-    if (!json) { 
+    if (!json) {
       return undefined;
     }
     return JSON.parse(
