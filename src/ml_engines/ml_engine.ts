@@ -14,7 +14,7 @@ export default class MLEngine {
   handler: string;
 
   /** Engine used to create the mlEngine (e.g. postgres). */
-  connection_data: string | undefined;
+  connection_data?: any;
 
   /**
    *

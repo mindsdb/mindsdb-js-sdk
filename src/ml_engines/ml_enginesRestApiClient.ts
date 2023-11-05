@@ -158,7 +158,13 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
     const showMLEnginesQuery = `SHOW ML_ENGINES`;
     const sqlQueryResponse = await this.sqlClient.runQuery(showMLEnginesQuery);
     return sqlQueryResponse.rows.map(
-      (r) => new MLEngine(this, r['name'], r['handler'], this.fixJsonString(r['connection_data'] as string))
+      (r) =>
+        new MLEngine(
+          this,
+          r['name'],
+          r['handler'],
+          this.parseJson(r['connection_data'] as string)
+        )
     );
   }
 
@@ -178,14 +184,22 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
       this,
       mlEngineRow['name'],
       mlEngineRow['handler'],
-      this.fixJsonString(mlEngineRow['connection_data'] as string)
+      this.parseJson(mlEngineRow['connection_data'] as string)
     );
   }
 
-  private fixJsonString(json?: string): string | undefined {
-    return json?.replace(/'/g, '"').replace(/"([^"]+)":\s*"/g, '"$1":"').replace(/:\s*"(.*?)"/g, function (match, p1) {
-      return ': "' + p1.replace(/"/g, '\\"') + '"';
-  });
+  private parseJson(json?: string): any {
+    if (!json) { 
+      return undefined;
+    }
+    return JSON.parse(
+      json
+        ?.replace(/'/g, '"')
+        .replace(/"([^"]+)":\s*"/g, '"$1":"')
+        .replace(/:\s*"(.*?)"/g, function (match, p1) {
+          return ': "' + p1.replace(/"/g, '\\"') + '"';
+        })
+    );
   }
 
   /**
