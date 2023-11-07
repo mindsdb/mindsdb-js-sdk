@@ -4,6 +4,7 @@ import { AdjustOptions, TrainingOptions } from './trainingOptions';
 import SqlApiClient from '../sql/sqlApiClient';
 import {
   Model,
+  ModelDescribeAccuracy,
   ModelFeatureDescription,
   ModelPrediction,
   ModelRow,
@@ -184,6 +185,28 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       return [];
     }
     return sqlQueryResult.rows as Array<ModelFeatureDescription>;
+  }
+
+  /**
+   * Describes the features of this model.
+   * @param {string} name - Name of the model.
+   * @param {string} project - Project the model belongs to.
+   * @param {string} unique_id - Optional unique id to filter the accuracy by.
+   * @returns {Array<ModelDescribeAccuracy>} - All feature descriptions of the model. Empty if the model doesn't exist.
+   */
+  override async describeAccuracyModel(
+    name: string,
+    project: string,
+    unique_id?: string
+  ): Promise<Array<ModelDescribeAccuracy>> {
+    const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
+      name
+    )}.accuracy${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
+    const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
+    if (sqlQueryResult.rows.length === 0) {
+      return [];
+    }
+    return sqlQueryResult.rows as Array<ModelDescribeAccuracy>;
   }
 
   /**

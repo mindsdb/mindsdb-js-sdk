@@ -17,6 +17,10 @@ export default class Constants {
   /** MindsDB Projects endpoint. */
   public static readonly BASE_PROJECTS_URI = '/api/projects';
 
+  /** MindsDB ML Engines endpoint. */
+  public static readonly BASE_MLENGINES_URI = '/api/handlers/byom';
+
+
   // HTTP agent constants.
 
   /** How long to wait for an HTTP response before timeout. */
