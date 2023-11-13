@@ -1,6 +1,6 @@
 import { JsonValue } from '../util/json';
 
-/** Structure of options to use when adjusting a model.  */
+/** Structure of options to use when finetuning a model.  */
 interface FinetuneOptions {
   /** Integration name for the training data (e.g. mindsdb). */
   integration: string;

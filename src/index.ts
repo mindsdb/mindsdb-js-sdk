@@ -24,7 +24,7 @@ import {
 } from './models/model';
 import { MindsDbError } from './errors';
 import { BatchQueryOptions, QueryOptions } from './models/queryOptions';
-import { AdjustOptions, TrainingOptions } from './models/trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './models/trainingOptions';
 import Project from './projects/project';
 import SqlQueryResult from './sql/sqlQueryResult';
 import Table from './tables/table';
@@ -100,7 +100,7 @@ export {
   MindsDbError,
   BatchQueryOptions,
   QueryOptions,
-  AdjustOptions,
+  FinetuneOptions,
   TrainingOptions,
   Project,
   SqlQueryResult,

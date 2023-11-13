@@ -1,7 +1,7 @@
 import { JsonPrimitive } from '../util/json';
 import ModelsApiClient from './modelsApiClient';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
-import { AdjustOptions, TrainingOptions } from './trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
 /** Status of a model being up to date or not. */
 type UpdateStatus = 'available' | 'updating' | 'up_to_date';
@@ -245,13 +245,13 @@ class Model {
   }
 
   /**
-   * Partially adjusts this model with the given options.
+   * Partially finetune this model with the given options.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
-   * @param {AdjustOptions} options - Options to use when adjusting the model.
-   * @throws {MindsDbError} - Something went wrong adjusting this model.
+   * @param {FinetuneOptions} options - Options to use when finetuning the model.
+   * @throws {MindsDbError} - Something went wrong finetuning this model.
    */
-  adjust(integration: string, options: AdjustOptions): Promise<void> {
-    return this.modelsApiClient.adjustModel(this.name, this.project, options);
+  finetune(integration: string, options: FinetuneOptions): Promise<void> {
+    return this.modelsApiClient.finetuneModel(this.name, this.project, options);
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Model, ModelDescribeAccuracy, ModelFeatureDescription, ModelPrediction } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
-import { AdjustOptions, TrainingOptions } from './trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
 /**
  * Abstract class outlining Model API operations supported by the SDK.
@@ -122,12 +122,12 @@ export default abstract class ModelsApiClient {
    * Partially finetunes this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {AdjustOptions} [options] - Options to use when finetuning the model.
+   * @param {FinetuneOptions} [options] - Options to use when finetuning the model.
    * @throws {MindsDbError} - Something went wrong finetuning the model.
    */
   abstract finetuneModel(
     name: string,
     project: string,
-    options?: AdjustOptions
+    options?: FinetuneOptions
   ): Promise<void>;
 }
