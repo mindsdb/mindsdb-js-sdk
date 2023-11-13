@@ -464,7 +464,7 @@ USING
     expect(actualQuery).toEqual(expectedQuery);
   });
 
-  test('should adjust model', async () => {
+  test('should finetune model', async () => {
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
@@ -477,7 +477,7 @@ USING
       });
     });
 
-    await modelsRestApiClient.adjustModel(
+    await modelsRestApiClient.finetuneModel(
       'my_test_model',
       'my_test_project',
       {
@@ -492,7 +492,7 @@ USING
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `ADJUST \`my_test_project\`.\`my_test_model\` FROM \`my_integration\`
+    const expectedQuery = `FINETUNE \`my_test_project\`.\`my_test_model\` FROM \`my_integration\`
 (SELECT * FROM my_db.my_table)
 USING
 \`tag\` = 'test-tag',

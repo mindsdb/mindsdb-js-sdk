@@ -119,13 +119,13 @@ export default abstract class ModelsApiClient {
   ): Promise<void>;
 
   /**
-   * Partially adjusts this model with the given options.
+   * Partially finetunes this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {AdjustOptions} [options] - Options to use when adjusting the model.
-   * @throws {MindsDbError} - Something went wrong adjusting the model.
+   * @param {AdjustOptions} [options] - Options to use when finetuning the model.
+   * @throws {MindsDbError} - Something went wrong finetuning the model.
    */
-  abstract adjustModel(
+  abstract finetuneModel(
     name: string,
     project: string,
     options?: AdjustOptions

@@ -1,6 +1,6 @@
 import ModelsApiClient from './modelsApiClient';
 import mysql from 'mysql';
-import { AdjustOptions, TrainingOptions } from './trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 import SqlApiClient from '../sql/sqlApiClient';
 import {
   Model,
@@ -43,7 +43,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   }
 
   private makeTrainingSelectClause(
-    options: TrainingOptions | AdjustOptions
+    options: TrainingOptions | FinetuneOptions
   ): string {
     const select = options['select'];
     if (select) {
@@ -110,7 +110,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   }
 
   private makeTrainingUsingClause(
-    options: AdjustOptions | TrainingOptions
+    options: FinetuneOptions | TrainingOptions
   ): string {
     const using = options['using'];
     if (!using) {
@@ -404,23 +404,23 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   }
 
   /**
-   * Partially adjusts this model with the given options.
+   * Partially finetune this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {AdjustOptions} options - Options to use when adjusting the model.
+   * @param {FinetuneOptions} options - Options to use when finetuning the model.
    * @throws {MindsDbError} - Something went wrong querying the model.
    */
-  override async adjustModel(
+  override async finetuneModel(
     name: string,
     project: string,
-    adjustOptions: AdjustOptions
+    finetuneOptions: FinetuneOptions
   ): Promise<void> {
-    const adjustClause = `ADJUST ${mysql.escapeId(project)}.${mysql.escapeId(
+    const finetuneClause = `FINETUNE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )} FROM ${mysql.escapeId(adjustOptions['integration'])}`;
-    const selectClause = this.makeTrainingSelectClause(adjustOptions);
-    const usingClause = this.makeTrainingUsingClause(adjustOptions);
-    const query = [adjustClause, selectClause, usingClause].join('\n');
+    )} FROM ${mysql.escapeId(finetuneOptions['integration'])}`;
+    const selectClause = this.makeTrainingSelectClause(finetuneOptions);
+    const usingClause = this.makeTrainingUsingClause(finetuneOptions);
+    const query = [finetuneClause, selectClause, usingClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(query);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
