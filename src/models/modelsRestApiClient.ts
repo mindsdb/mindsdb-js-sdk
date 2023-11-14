@@ -4,7 +4,7 @@ import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 import SqlApiClient from '../sql/sqlApiClient';
 import {
   Model,
-  ModelDescribeAccuracy,
+  ModelDescribeAttribute,
   ModelFeatureDescription,
   ModelPrediction,
   ModelRow,
@@ -191,22 +191,24 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {string} attribute - The attribute to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
-   * @returns {Array<ModelDescribeAccuracy>} - All feature descriptions of the model. Empty if the model doesn't exist.
+   * @returns {Array<ModelDescribeAttribute>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
-  override async describeAccuracyModel(
+  override async describeModelAttribute(
     name: string,
     project: string,
+    attribute: string,
     unique_id?: string
-  ): Promise<Array<ModelDescribeAccuracy>> {
+  ): Promise<Array<ModelDescribeAttribute>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )}.accuracy${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
+    )}.${attribute}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
     }
-    return sqlQueryResult.rows as Array<ModelDescribeAccuracy>;
+    return sqlQueryResult.rows as Array<ModelDescribeAttribute>;
   }
 
   /**
@@ -371,7 +373,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     targetColumn: string,
     project: string,
     trainingOptions?: TrainingOptions
-  ): Promise<void> {
+  ): Promise<Model> {
     const retrainClause = this.makeRetrainClause(name, project);
     let query = retrainClause;
     if (trainingOptions) {
@@ -401,6 +403,8 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
+
+    return Model.fromModelRow(sqlQueryResult.rows[0] as ModelRow, this);
   }
 
   /**
@@ -414,7 +418,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     project: string,
     finetuneOptions: FinetuneOptions
-  ): Promise<void> {
+  ): Promise<Model> {
     const finetuneClause = `FINETUNE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
     )} FROM ${mysql.escapeId(finetuneOptions['integration'])}`;
@@ -425,5 +429,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
+
+    return Model.fromModelRow(sqlQueryResult.rows[0] as ModelRow, this);
   }
 }

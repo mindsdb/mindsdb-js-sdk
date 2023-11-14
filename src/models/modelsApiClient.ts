@@ -1,4 +1,4 @@
-import { Model, ModelDescribeAccuracy, ModelFeatureDescription, ModelPrediction } from './model';
+import { Model, ModelDescribeAttribute, ModelFeatureDescription, ModelPrediction } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
@@ -36,14 +36,16 @@ export default abstract class ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {string} attribute - The attribute to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
-   * @returns {Array<ModelDescribeAccuracy>} - All feature descriptions of the model. Empty if the model doesn't exist.
+   * @returns {Array<ModelDescribeAttribute>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
-  abstract describeAccuracyModel(
+  abstract describeModelAttribute(
     name: string,
     project: string,
+    attribute: string,
     unique_id?: string
-  ): Promise<Array<ModelDescribeAccuracy>>;
+  ): Promise<Array<ModelDescribeAttribute>>;
 
   /**
    * Deletes this model.
@@ -116,7 +118,7 @@ export default abstract class ModelsApiClient {
     targetColumn: string,
     project: string,
     options?: TrainingOptions
-  ): Promise<void>;
+  ): Promise<Model>;
 
   /**
    * Partially finetunes this model with the given options.
@@ -129,5 +131,5 @@ export default abstract class ModelsApiClient {
     name: string,
     project: string,
     options?: FinetuneOptions
-  ): Promise<void>;
+  ): Promise<Model>;
 }
