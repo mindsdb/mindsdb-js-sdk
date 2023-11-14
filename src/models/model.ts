@@ -168,7 +168,7 @@ class Model {
    * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model.
    */
   describe(): Promise<Array<ModelFeatureDescription>> {
-    return this.modelsApiClient.describeModel(this.name, this.project);
+    return this.modelsApiClient.describeModel(this.name, this.project, this.version);
   }
 
   /**
@@ -178,7 +178,7 @@ class Model {
    * @returns {Array<ModelDescribeAttribute>} - Result.
    */
   describeAttribute(attribute: string, unique_id?: string): Promise<Array<ModelDescribeAttribute>> {
-    return this.modelsApiClient.describeModelAttribute(this.name, this.project, attribute, unique_id);
+    return this.modelsApiClient.describeModelAttribute(this.name, this.project, attribute, this.version, unique_id);
   }
 
   /**

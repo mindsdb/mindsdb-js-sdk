@@ -11,6 +11,7 @@ import {
 } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { MindsDbError } from '../errors';
+import { version } from 'prettier';
 
 /** Implementation of ModelsApiClient that goes through the REST API */
 export default class ModelsRestApiClient extends ModelsApiClient {
@@ -171,15 +172,17 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {number} [version] - Optional version of the model to describe.
    * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
   override async describeModel(
     name: string,
-    project: string
+    project: string,
+    version?: number
   ): Promise<Array<ModelFeatureDescription>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )}.features`;
+    )}.${ version ? `${version}.` : ''}features`;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
@@ -192,6 +195,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
    * @param {string} attribute - The attribute to describe.
+   * @param {number} [version] - Optional version of the model to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
    * @returns {Array<ModelDescribeAttribute>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
@@ -199,11 +203,12 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     project: string,
     attribute: string,
+    version?: number,
     unique_id?: string
   ): Promise<Array<ModelDescribeAttribute>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )}.${attribute}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
+    )}.${ version ? `${version}.` : ''}${attribute}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
