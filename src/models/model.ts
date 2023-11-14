@@ -1,7 +1,7 @@
 import { JsonPrimitive } from '../util/json';
 import ModelsApiClient from './modelsApiClient';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
-import { AdjustOptions, TrainingOptions } from './trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
 /** Status of a model being up to date or not. */
 type UpdateStatus = 'available' | 'updating' | 'up_to_date';
@@ -85,10 +85,7 @@ interface ModelPrediction {
   data: object;
 }
 
-interface ModelDescribeAccuracy {
-  unique_id: string;
-  cutoff: Date;
-  metric: string;
+interface ModelDescribeAttribute {
   [key: string]: unknown;
 }
 
@@ -175,12 +172,13 @@ class Model {
   }
 
   /**
-   * Describes the accuracy of this model.
+   * Describes an attribute of this model.
+   * @param {string} attribute - The attribute to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
-   * @returns {Array<ModelDescribeAccuracy>} - The accuracy of the model.
+   * @returns {Array<ModelDescribeAttribute>} - Result.
    */
-  describeAccuracy(unique_id?: string): Promise<Array<ModelDescribeAccuracy>> {
-    return this.modelsApiClient.describeAccuracyModel(this.name, this.project, unique_id);
+  describeAttribute(attribute: string, unique_id?: string): Promise<Array<ModelDescribeAttribute>> {
+    return this.modelsApiClient.describeModelAttribute(this.name, this.project, attribute, unique_id);
   }
 
   /**
@@ -228,7 +226,7 @@ class Model {
    * @param {TrainingOptions} options - Options to use when retraining the model.
    * @throws {MindsDbError} - Something went wrong retraining this model.
    */
-  retrain(options?: TrainingOptions): Promise<void> {
+  retrain(options?: TrainingOptions): Promise<Model> {
     if (options) {
       return this.modelsApiClient.retrainModel(
         this.name,
@@ -245,13 +243,13 @@ class Model {
   }
 
   /**
-   * Partially adjusts this model with the given options.
+   * Partially finetune this model with the given options.
    * @param {string} integration - Integration name for the training data (e.g. mindsdb).
-   * @param {AdjustOptions} options - Options to use when adjusting the model.
-   * @throws {MindsDbError} - Something went wrong adjusting this model.
+   * @param {FinetuneOptions} options - Options to use when finetuning the model.
+   * @throws {MindsDbError} - Something went wrong finetuning this model.
    */
-  adjust(integration: string, options: AdjustOptions): Promise<void> {
-    return this.modelsApiClient.adjustModel(this.name, this.project, options);
+  finetune(integration: string, options: FinetuneOptions): Promise<Model> {
+    return this.modelsApiClient.finetuneModel(this.name, this.project, options);
   }
 
   /**
@@ -276,4 +274,4 @@ class Model {
   }
 }
 
-export { Model, ModelFeatureDescription, ModelPrediction, ModelRow, ModelDescribeAccuracy };
+export { Model, ModelFeatureDescription, ModelPrediction, ModelRow, ModelDescribeAttribute };

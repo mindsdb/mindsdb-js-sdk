@@ -196,9 +196,10 @@ describe('Testing Models REST API client', () => {
       });
     });
 
-    const actualModelDescriptions = await modelsRestApiClient.describeAccuracyModel(
+    const actualModelDescriptions = await modelsRestApiClient.describeModelAttribute(
       'my_test_model',
-      'my_test_project'
+      'my_test_project',
+      'accuracy'
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
@@ -239,9 +240,10 @@ describe('Testing Models REST API client', () => {
       });
     });
 
-    const actualModelDescriptions = await modelsRestApiClient.describeAccuracyModel(
+    const actualModelDescriptions = await modelsRestApiClient.describeModelAttribute(
       'my_test_model',
       'my_test_project',
+      'accuracy',
       '1'
     );
 
@@ -417,6 +419,16 @@ USING
 
   test('should retrain model', async () => {
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
+    const modelRow = {
+      name: 'my_test_model',
+      project: 'my_test_project',
+      predict: 'my_target_column',
+      status: 'my_status',
+      update_status: 'my_update_status',
+      version: 1,
+      accuracy: 1,
+      tag: 'my_tag',
+    };
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
         columnNames: [],
@@ -424,7 +436,7 @@ USING
           db: 'mindsdb',
         },
         type: 'ok',
-        rows: [],
+        rows: [modelRow],
       });
     });
 
@@ -464,8 +476,18 @@ USING
     expect(actualQuery).toEqual(expectedQuery);
   });
 
-  test('should adjust model', async () => {
+  test('should finetune model', async () => {
     const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
+    const modelRow = {
+      name: 'my_test_model',
+      project: 'my_test_project',
+      predict: 'my_target_column',
+      status: 'my_status',
+      update_status: 'my_update_status',
+      version: 1,
+      accuracy: 1,
+      tag: 'my_tag',
+    };
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
         columnNames: [],
@@ -473,11 +495,11 @@ USING
           db: 'mindsdb',
         },
         type: 'ok',
-        rows: [],
+        rows: [modelRow],
       });
     });
 
-    await modelsRestApiClient.adjustModel(
+    await modelsRestApiClient.finetuneModel(
       'my_test_model',
       'my_test_project',
       {
@@ -492,7 +514,7 @@ USING
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `ADJUST \`my_test_project\`.\`my_test_model\` FROM \`my_integration\`
+    const expectedQuery = `FINETUNE \`my_test_project\`.\`my_test_model\` FROM \`my_integration\`
 (SELECT * FROM my_db.my_table)
 USING
 \`tag\` = 'test-tag',

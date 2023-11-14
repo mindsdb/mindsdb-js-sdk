@@ -1,13 +1,13 @@
 import { JsonValue } from '../util/json';
 
-/** Structure of options to use when adjusting a model.  */
-interface AdjustOptions {
+/** Structure of options to use when finetuning a model.  */
+interface FinetuneOptions {
   /** Integration name for the training data (e.g. mindsdb). */
   integration: string;
   /** SELECT SQL statement to use for selecting data. */
   select: string;
 
-  /** Model and training parameters to set during adjustment. */
+  /** Model and training parameters to set during finetuning. */
   using?: Record<string, JsonValue>;
 }
 
@@ -34,4 +34,4 @@ interface TrainingOptions {
   using?: Record<string, JsonValue>;
 }
 
-export { AdjustOptions, TrainingOptions };
+export { FinetuneOptions, TrainingOptions };

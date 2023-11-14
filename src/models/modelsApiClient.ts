@@ -1,6 +1,6 @@
-import { Model, ModelDescribeAccuracy, ModelFeatureDescription, ModelPrediction } from './model';
+import { Model, ModelDescribeAttribute, ModelFeatureDescription, ModelPrediction } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
-import { AdjustOptions, TrainingOptions } from './trainingOptions';
+import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
 /**
  * Abstract class outlining Model API operations supported by the SDK.
@@ -36,14 +36,16 @@ export default abstract class ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {string} attribute - The attribute to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
-   * @returns {Array<ModelDescribeAccuracy>} - All feature descriptions of the model. Empty if the model doesn't exist.
+   * @returns {Array<ModelDescribeAttribute>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
-  abstract describeAccuracyModel(
+  abstract describeModelAttribute(
     name: string,
     project: string,
+    attribute: string,
     unique_id?: string
-  ): Promise<Array<ModelDescribeAccuracy>>;
+  ): Promise<Array<ModelDescribeAttribute>>;
 
   /**
    * Deletes this model.
@@ -116,18 +118,18 @@ export default abstract class ModelsApiClient {
     targetColumn: string,
     project: string,
     options?: TrainingOptions
-  ): Promise<void>;
+  ): Promise<Model>;
 
   /**
-   * Partially adjusts this model with the given options.
+   * Partially finetunes this model with the given options.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
-   * @param {AdjustOptions} [options] - Options to use when adjusting the model.
-   * @throws {MindsDbError} - Something went wrong adjusting the model.
+   * @param {FinetuneOptions} [options] - Options to use when finetuning the model.
+   * @throws {MindsDbError} - Something went wrong finetuning the model.
    */
-  abstract adjustModel(
+  abstract finetuneModel(
     name: string,
     project: string,
-    options?: AdjustOptions
-  ): Promise<void>;
+    options?: FinetuneOptions
+  ): Promise<Model>;
 }
