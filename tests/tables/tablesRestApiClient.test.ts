@@ -3,6 +3,7 @@ import axios from 'axios';
 import TablesRestApiClient from '../../src/tables/tablesRestApiClient';
 import SqlRestApiClient from '../../src/sql/sqlRestApiClient';
 import HttpAuthenticator from '../../src/httpAuthenticator';
+import { LogLevel, Logger } from '../../src/util/logger';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -12,7 +13,8 @@ const mockedHttpAuthenticator =
 jest.mock('../../src/sql/sqlRestApiClient');
 const mockedSqlRestApiClient = new SqlRestApiClient(
   mockedAxios,
-  mockedHttpAuthenticator
+  mockedHttpAuthenticator,
+  new Logger(console, LogLevel.ERROR)
 ) as jest.Mocked<SqlRestApiClient>;
 
 describe('Testing Models REST API client', () => {

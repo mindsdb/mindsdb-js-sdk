@@ -57,13 +57,15 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   override async updateMLEngine(
     name: string, // This is the variable that will be used in the URL
     codeFilePath: string | Readable,
-    modulesFilePath: string | Readable
+    modulesFilePath: string | Readable,
+    type: 'venv' | 'inhouse' = 'inhouse'
   ): Promise<MLEngine | undefined> {
     return this.createOrUpdateMLEngine(
       'post',
       name,
       codeFilePath,
-      modulesFilePath
+      modulesFilePath,
+      type
     );
   }
 
@@ -71,11 +73,13 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
     httpMethod: 'post' | 'put',
     name: string,
     codeFilePathOrStream: string | Readable,
-    modulesFilePathOrStream: string | Readable
+    modulesFilePathOrStream: string | Readable,
+    type: 'venv' | 'inhouse' = 'inhouse'
   ): Promise<MLEngine | undefined> {
     const formData = new FormData();
 
     formData.append('source', name);
+    formData.append('type', type);
 
     // Append the 'code' file part, checking if it's a stream or a string
     if (codeFilePathOrStream instanceof Readable) {

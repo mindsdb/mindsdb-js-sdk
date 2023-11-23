@@ -32,13 +32,16 @@ import { JsonPrimitive, JsonValue } from './util/json';
 import View from './views/view';
 import MLEnginesModule from './ml_engines/ml_enginesModule';
 import CallbacksModule from './callback/callbacksModule';
+import { ILogger, Logger, LogLevel } from './util/logger';
 
 const defaultAxiosInstance = createDefaultAxiosInstance();
 const httpAuthenticator = new HttpAuthenticator();
+const defaultLogger = new Logger(console, LogLevel.ERROR);
 
 const SQL = new SQLModule.SqlRestApiClient(
   defaultAxiosInstance,
-  httpAuthenticator
+  httpAuthenticator,
+  defaultLogger
 );
 const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
@@ -48,8 +51,15 @@ const Projects = new ProjectsModule.ProjectsRestApiClient(
 );
 const Tables = new TablesModule.TablesRestApiClient(SQL);
 const Views = new ViewsModule.ViewsRestApiClient(SQL);
-const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(SQL, defaultAxiosInstance, httpAuthenticator);
-const Callbacks = new CallbacksModule.CallbacksRestApiClient(defaultAxiosInstance, httpAuthenticator);
+const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
+  SQL,
+  defaultAxiosInstance,
+  httpAuthenticator
+);
+const Callbacks = new CallbacksModule.CallbacksRestApiClient(
+  defaultAxiosInstance,
+  httpAuthenticator
+);
 
 const getAxiosInstance = function (options: ConnectionOptions): Axios {
   const httpClient = options.httpClient || defaultAxiosInstance;
@@ -73,6 +83,14 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   const httpClient = getAxiosInstance(options);
   SQL.client = httpClient;
   Projects.client = httpClient;
+  MLEngines.client = httpClient;
+  Callbacks.client = httpClient;
+
+  if (options.logging) {
+    const logger = new Logger(options.logging.logger, options.logging.logLevel);
+    SQL.logger = logger;
+  }
+
   const baseURL =
     httpClient.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
   // Need to authenticate if we're using the Cloud API endpoints.
@@ -90,7 +108,17 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   }
 };
 
-export default { connect, SQL, Databases, Models, Projects, Tables, Views, MLEngines, Callbacks };
+export default {
+  connect,
+  SQL,
+  Databases,
+  Models,
+  Projects,
+  Tables,
+  Views,
+  MLEngines,
+  Callbacks,
+};
 export {
   ConnectionOptions,
   Database,
@@ -108,4 +136,6 @@ export {
   JsonPrimitive,
   JsonValue,
   View,
+  ILogger,
+  LogLevel,
 };

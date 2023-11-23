@@ -182,7 +182,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   ): Promise<Array<ModelFeatureDescription>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )}.${ version ? `${version}.` : ''}features`;
+    )}.${ version ? `${mysql.escapeId(version.toString())}.` : ''}\`features\``;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
@@ -208,7 +208,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   ): Promise<Array<ModelDescribeAttribute>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
       name
-    )}.${ version ? `${version}.` : ''}${attribute}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
+    )}.${ version ? `${mysql.escapeId(version.toString())}.` : ''}${mysql.escapeId(attribute)}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];

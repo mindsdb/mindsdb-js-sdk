@@ -8,7 +8,6 @@ import { MindsDbError } from '../errors';
 
 /** Implementation of ProjectsApiClient that goes through the REST API. */
 export default class CallbacksRestApiClient extends CallbacksApiClient {
-  
   /** Axios client to send all HTTP requests. */
   client: Axios;
 
@@ -35,15 +34,30 @@ export default class CallbacksRestApiClient extends CallbacksApiClient {
   /**
    * Creates a new callback with the provided URL.
    * @param {string} url - The URL to be associated with the new callback.
+   * @param {object} [options] - Optional parameters for the callback.
    * @returns {Promise<Callback>} - A promise that resolves to the newly created callback.
    */
-  async createCallback(url: string): Promise<Callback> {
+  async createCallback(
+    url: string,
+    options?: {
+      filter: {
+        model_name: string;
+        project_name: string;
+        new_status: string[];
+      };
+      attempt: {
+        count: number;
+        http_timeout: number;
+        interval: number;
+      };
+    }
+  ): Promise<Callback> {
     const callbacksUrl = this.getCallbacksUrl();
     const { authenticator, client } = this;
     try {
       const callbacksResponse = await client.post(
         callbacksUrl,
-        {url},
+        { url, ...(options || {}) },
         getBaseRequestConfig(authenticator)
       );
       if (!callbacksResponse.data) {
@@ -88,7 +102,7 @@ export default class CallbacksRestApiClient extends CallbacksApiClient {
     try {
       const callbacksResponse = await client.put(
         `${callbacksUrl}/${id}`,
-        {url},
+        { url },
         getBaseRequestConfig(authenticator)
       );
       if (!callbacksResponse.data) {
