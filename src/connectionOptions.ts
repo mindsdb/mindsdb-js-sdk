@@ -1,4 +1,5 @@
 import { Axios } from 'axios';
+import { ILogger, LogLevel } from './util/logger';
 
 /**
  * Options used for connecting to the MindsDB SDK.
@@ -18,10 +19,18 @@ export default interface ConnectionOptions {
   /** Is it a managed instance?
    * Defaults to false.
    */
-  managed?: boolean,
+  managed?: boolean;
 
   /**
    * Custom Axios client to use for sending API requests.
    */
   httpClient?: Axios;
+
+  /**
+   * Logging configuration.
+   */
+  logging?: {
+    logLevel: LogLevel;
+    logger: ILogger;
+  };
 }

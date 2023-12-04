@@ -2,6 +2,7 @@ import axios from 'axios';
 import Constants from '../../src/constants';
 import HttpAuthenticator from '../../src/httpAuthenticator';
 import SqlRestApiClient from '../../src/sql/sqlRestApiClient';
+import { LogLevel, Logger } from '../../src/util/logger';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -14,7 +15,8 @@ describe('Testing SQL REST API client', () => {
   test('runQuery returns correct data', async () => {
     const restApiClient = new SqlRestApiClient(
       mockedAxios,
-      mockedHttpAuthenticator
+      mockedHttpAuthenticator,
+      new Logger(console, LogLevel.DEBUG)
     );
     // Response format of https://docs.mindsdb.com/rest/sql.
     mockedAxios.post.mockResolvedValue({

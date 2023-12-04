@@ -9,6 +9,9 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import Constants from '../constants';
 import HttpAuthenticator from '../httpAuthenticator';
 import { MindsDbError } from '../errors';
+import JSONbig from 'json-bigint';
+
+const JSONbigString = JSONbig({ storeAsString: true });
 
 /**
  * Creates the default Axios instance to use for all SDK HTTP requests.
@@ -48,6 +51,13 @@ function getBaseRequestConfig(
       Cookie: `session=${authenticator.session}`,
     };
   }
+  requestConfig.transformResponse = [(data) => {
+    try {
+      return JSONbigString.parse(data);
+    } catch (error) {
+      return data; // Return raw data if parsing fails
+    }
+  }];
   return requestConfig;
 }
 

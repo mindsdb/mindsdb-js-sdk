@@ -7,6 +7,7 @@ import SqlQueryResult from './sqlQueryResult';
 import { getBaseRequestConfig } from '../util/http';
 import { MindsDbError } from '../errors';
 import HttpAuthenticator from '../httpAuthenticator';
+import { ILogger, Logger } from '../util/logger';
 
 /**
  * Class to perform SQL operations through the REST API.
@@ -19,14 +20,18 @@ export default class SqlRestApiClient extends SqlApiClient {
   /** Authenticator to use for reauthenticating if needed. */
   authenticator: HttpAuthenticator;
 
+  /** Loggger to use for logging. */
+  logger: Logger;
+
   /**
    *
    * @param {Axios} client - Axios instance used for all requests.
    */
-  constructor(client: Axios, authenticator: HttpAuthenticator) {
+  constructor(client: Axios, authenticator: HttpAuthenticator, logger: Logger) {
     super();
     this.client = client;
     this.authenticator = authenticator;
+    this.logger = logger;
   }
 
   /**
@@ -80,6 +85,7 @@ export default class SqlRestApiClient extends SqlApiClient {
    * @throws {MindsDbError} - Something went wrong sending the API request.
    */
   override async runQuery(query: string): Promise<SqlQueryResult> {
+    this.logger.debug(`Running query: ${query}`);
     const queryRequest = {
       query,
     };

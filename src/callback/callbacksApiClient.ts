@@ -5,9 +5,24 @@ export default abstract class CallbacksApiClient {
   /**
    * Creates a new callback with the provided URL.
    * @param {string} url - The URL to be associated with the new callback.
+   * @param {object} [options] - Optional parameters for the callback.
    * @returns {Promise<Callback>} - A promise that resolves to the newly created callback.
    */
-  abstract createCallback(url: string): Promise<Callback>;
+  abstract createCallback(
+    url: string,
+    options?: {
+      filter: {
+        model_name: string;
+        project_name: string;
+        new_status: string[];
+      };
+      attempt: {
+        count: number;
+        http_timeout: number;
+        interval: number;
+      };
+    }
+  ): Promise<Callback>;
 
   /**
    * Retrieves all callbacks associated with the current user.

@@ -25,11 +25,13 @@ export default abstract class ModelsApiClient {
    * Describes the features of this model.
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
+   * @param {number} [version] - Optional version of the model to describe.
    * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
   abstract describeModel(
     name: string,
-    project: string
+    project: string,
+    version?: number
   ): Promise<Array<ModelFeatureDescription>>;
 
   /**
@@ -37,6 +39,7 @@ export default abstract class ModelsApiClient {
    * @param {string} name - Name of the model.
    * @param {string} project - Project the model belongs to.
    * @param {string} attribute - The attribute to describe.
+   * @param {number} [version] - Optional version of the model to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
    * @returns {Array<ModelDescribeAttribute>} - All feature descriptions of the model. Empty if the model doesn't exist.
    */
@@ -44,6 +47,7 @@ export default abstract class ModelsApiClient {
     name: string,
     project: string,
     attribute: string,
+    version?: number,
     unique_id?: string
   ): Promise<Array<ModelDescribeAttribute>>;
 

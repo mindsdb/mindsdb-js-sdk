@@ -57,13 +57,15 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
   override async updateMLEngine(
     name: string, // This is the variable that will be used in the URL
     codeFilePath: string | Readable,
-    modulesFilePath: string | Readable
+    modulesFilePath: string | Readable,
+    type: 'venv' | 'inhouse' = 'inhouse'
   ): Promise<MLEngine | undefined> {
     return this.createOrUpdateMLEngine(
       'post',
       name,
       codeFilePath,
-      modulesFilePath
+      modulesFilePath,
+      type
     );
   }
 
@@ -71,11 +73,13 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
     httpMethod: 'post' | 'put',
     name: string,
     codeFilePathOrStream: string | Readable,
-    modulesFilePathOrStream: string | Readable
+    modulesFilePathOrStream: string | Readable,
+    type: 'venv' | 'inhouse' = 'inhouse'
   ): Promise<MLEngine | undefined> {
     const formData = new FormData();
 
     formData.append('source', name);
+    formData.append('type', type);
 
     // Append the 'code' file part, checking if it's a stream or a string
     if (codeFilePathOrStream instanceof Readable) {
@@ -146,19 +150,22 @@ export default class MLEnginesRestApiClient extends MLEngineApiClient {
    * @param {string} name - Name of the MLEngine to be created.
    * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
    * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
+   * @param {string} [type] - Type of the mlEngine to be created.
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
   override async createMLEngine(
     name: string, // This is the variable that will be used in the URL
     codeFilePath: string | Readable,
-    modulesFilePath: string | Readable
+    modulesFilePath: string | Readable,
+    type: 'venv' | 'inhouse' = 'inhouse'
   ): Promise<MLEngine | undefined> {
     return this.createOrUpdateMLEngine(
       'put',
       name,
       codeFilePath,
-      modulesFilePath
+      modulesFilePath,
+      type
     );
   }
 

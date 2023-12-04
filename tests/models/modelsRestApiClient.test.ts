@@ -3,6 +3,7 @@ import { Model, ModelPrediction } from '../../src/models/model';
 import ModelsRestApiClient from '../../src/models/modelsRestApiClient';
 import SqlRestApiClient from '../../src/sql/sqlRestApiClient';
 import HttpAuthenticator from '../../src/httpAuthenticator';
+import { LogLevel, Logger } from '../../src/util/logger';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -13,7 +14,7 @@ const mockedHttpAuthenticator =
 jest.mock('../../src/sql/sqlRestApiClient');
 const mockedSqlRestApiClient = new SqlRestApiClient(
   mockedAxios,
-  mockedHttpAuthenticator
+  mockedHttpAuthenticator, new Logger(console, LogLevel.ERROR)
 ) as jest.Mocked<SqlRestApiClient>;
 
 describe('Testing Models REST API client', () => {
@@ -154,7 +155,55 @@ describe('Testing Models REST API client', () => {
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.features`;
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.\`features\``;
+    expect(actualQuery).toEqual(expectedQuery);
+
+    expect(actualModelDescriptions[0].column).toEqual('my_column1');
+    expect(actualModelDescriptions[0].type).toEqual('my_type1');
+    expect(actualModelDescriptions[0].encoder).toEqual('MyEncoder1');
+    expect(actualModelDescriptions[0].role).toEqual('my_role1');
+
+    expect(actualModelDescriptions[1].column).toEqual('my_column2');
+    expect(actualModelDescriptions[1].type).toEqual('my_type2');
+    expect(actualModelDescriptions[1].encoder).toEqual('MyEncoder2');
+    expect(actualModelDescriptions[1].role).toEqual('my_role2');
+  });
+
+  test('should describe versioned model', async () => {
+    const modelsRestApiClient = new ModelsRestApiClient(mockedSqlRestApiClient);
+    const expectedModelDescriptions = [
+      {
+        column: 'my_column1',
+        type: 'my_type1',
+        encoder: 'MyEncoder1',
+        role: 'my_role1',
+      },
+      {
+        column: 'my_column2',
+        type: 'my_type2',
+        encoder: 'MyEncoder2',
+        role: 'my_role2',
+      },
+    ];
+    mockedSqlRestApiClient.runQuery.mockImplementation(() => {
+      return Promise.resolve({
+        columnNames: [],
+        context: {
+          db: 'mindsdb',
+        },
+        type: 'ok',
+        rows: expectedModelDescriptions,
+      });
+    });
+
+    const actualModelDescriptions = await modelsRestApiClient.describeModel(
+      'my_test_model',
+      'my_test_project',
+      3
+    );
+
+    const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.\`3\`.\`features\``;
     expect(actualQuery).toEqual(expectedQuery);
 
     expect(actualModelDescriptions[0].column).toEqual('my_column1');
@@ -199,11 +248,12 @@ describe('Testing Models REST API client', () => {
     const actualModelDescriptions = await modelsRestApiClient.describeModelAttribute(
       'my_test_model',
       'my_test_project',
-      'accuracy'
+      'accuracy',
+      undefined,
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.accuracy`;
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.\`accuracy\``;
     expect(actualQuery).toEqual(expectedQuery);
 
     expect(actualModelDescriptions[0].unique_id).toEqual('1');
@@ -244,11 +294,12 @@ describe('Testing Models REST API client', () => {
       'my_test_model',
       'my_test_project',
       'accuracy',
-      '1'
+      1,
+      'uid'
     );
 
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
-    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.accuracy.\`1\``;
+    const expectedQuery = `DESCRIBE \`my_test_project\`.\`my_test_model\`.\`1\`.\`accuracy\`.\`uid\``;
     expect(actualQuery).toEqual(expectedQuery);
 
     expect(actualModelDescriptions[0].unique_id).toEqual('1');

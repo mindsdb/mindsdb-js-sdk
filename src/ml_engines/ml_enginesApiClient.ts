@@ -23,13 +23,15 @@ export default abstract class MLEnginesApiClient {
    * @param {string} name - Name of the mlEngine to be created.
    * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
    * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
+   *  @param {string} [type] - Type of the mlEngine to be created.
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
   abstract createMLEngine(
     name: string,
     codeFilePath: string | Readable,
-    modulesFilePath: string | Readable
+    modulesFilePath: string | Readable,
+    type: 'venv' | 'inhouse'
   ): Promise<MLEngine | undefined>;
 
   /**
@@ -37,13 +39,15 @@ export default abstract class MLEnginesApiClient {
    * @param {string} name - Name of the mlEngine to be created.
    * @param {string | Readable} [codeFilePath] - Path to the code file to be used for the mlEngine.
    * @param {string | Readable} [modulesFilePath] - Path to the modules file to be used for the mlEngine.
+   * @param {string} [type] - Type of the mlEngine to be created.
    * @returns {Promise<MLEngine>} - Newly created mlEngine.
    * @throws {MindsDbError} - Something went wrong creating the mlEngine.
    */
   abstract updateMLEngine(
     name: string,
     codeFilePath: string | Readable,
-    modulesFilePath: string | Readable
+    modulesFilePath: string | Readable,
+    type: 'venv' | 'inhouse'
   ): Promise<MLEngine | undefined>;
 
   /**
