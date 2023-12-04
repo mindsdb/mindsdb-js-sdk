@@ -110,6 +110,24 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     return whereClause;
   }
 
+  private makeUsingClause (using: string | Array<string>): string {
+    if (!using) {
+      return '';
+    }
+    if (!Array.isArray(using)) {
+      return `USING ${using}\n`;
+    }
+    if (using.length === 0) {
+      return '';
+    }
+    let usingClause = `USING\n`;
+    for (let i = 0; i < using.length - 1; i++) {
+      usingClause += using[i] + `,\n`;
+    }
+    usingClause += using[using.length -1 ] + `\n`;
+    return usingClause;
+  }
+
   private makeTrainingUsingClause(
     options: FinetuneOptions | TrainingOptions
   ): string {
@@ -253,7 +271,8 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       project
     )}.${mysql.escapeId(name)}.${version}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
-    const selectQuery = [selectClause, whereClause].join('\n');
+    const usingClause = this.makeUsingClause(options['using'] || []);
+    const selectQuery = [selectClause, whereClause, usingClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);

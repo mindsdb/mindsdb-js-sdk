@@ -8,6 +8,11 @@ interface QueryOptions {
    * Example: ['t.field1 = val1', 't.field2 = val2'] joins against source data where field1 = val1 and field2 = val2.
    */
   where?: string | Array<string>;
+
+  /** A single USING condition, or array of USING statements to set the query options..
+   *  Example: 'max_tokens = 100' or ['max_tokens = 100', 'tempreature = 0.5'].
+   */
+  using?: string | Array<string>;
 }
 
 /** Structure of options to use when making a batch prediction. */
