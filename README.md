@@ -366,7 +366,7 @@ In general, we follow the "fork-and-pull" Git workflow.
 
 ### Contributor Code of Conduct
 
-Please note that this project is released with a [Contributor Code of Conduct](https://github.com/mindsdb/mindsdb/blob/stable/CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/mindsdb/mindsdb/blob/main/CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
 
 Join our mission of democratizing machine learning!
 
@@ -375,4 +375,5 @@ Join our mission of democratizing machine learning!
 If you have additional questions or you want to chat with the MindsDB core team, please join our [Slack community](https://join.slack.com/t/mindsdbcommunity/shared_invite/zt-o8mrmx3l-5ai~5H66s6wlxFfBMVI6wQ).
 
 To get updates on MindsDB’s latest announcements, releases, and events, sign up for our [Monthly Community Newsletter](https://mindsdb.com/newsletter/?utm_medium=community&utm_source=github&utm_campaign=mindsdb%20repo).
+
 
