@@ -29,6 +29,7 @@
     "@types/jest": "^29.4.0",
     "@types/json-bigint": "^1.0.4",
     "@types/mysql": "^2.15.21",
+    "@types/prettier": "^2.7.3",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
     "eslint": "^8.33.0",

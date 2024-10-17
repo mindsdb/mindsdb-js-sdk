@@ -94,7 +94,7 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   const baseURL =
     httpClient.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
   // Need to authenticate if we're using the Cloud API endpoints.
-  if (isMindsDbCloudEndpoint(baseURL) || !isLocalEndpoint(baseURL)) {
+  if (isMindsDbCloudEndpoint(baseURL)) {
     try {
       await httpAuthenticator.authenticate(
         httpClient,
