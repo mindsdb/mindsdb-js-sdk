@@ -40,4 +40,15 @@ export default abstract class TablesApiClient {
    * @throws {MindsDbError} - Something went wrong deleting the table.
    */
   abstract deleteTable(name: string, integration: string): Promise<void>;
+
+  /**
+   * Updates a table with new data in an integration.
+   * @param {string} name - Name of the table to be updated.
+   * @param {string} integration - Integration the table is part of.
+   * @param {string} setClause - The SET clause for updating the table, e.g. 'column1 = value1, column2 = value2'.
+   * @param {string} whereClause - The WHERE clause to specify which rows to update.
+   * @throws {MindsDbError} - Something went wrong updating the table.
+   */
+
+  abstract updateTable(name:string, integration:string, setClause:string, whereClause:string):Promise<Table>;
 }

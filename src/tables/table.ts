@@ -37,4 +37,20 @@ export default class Table {
   async delete(): Promise<void> {
     await this.tablesApiClient.deleteTable(this.name, this.integration);
   }
+
+    /**
+   * Updates this table with new data.
+   * @param {string} setClause - The SET clause for updating the table (e.g., 'column1 = value1, column2 = value2').
+   * @param {string} whereClause - The WHERE clause to specify which rows to update.
+   * @returns {Promise<Table>} - The updated table.
+   * @throws {MindsDbError} - Something went wrong updating this table.
+   */
+    async update(setClause: string, whereClause: string): Promise<Table> {
+      return await this.tablesApiClient.updateTable(
+        this.name,
+        this.integration,
+        setClause,
+        whereClause
+      );
+    }
 }
