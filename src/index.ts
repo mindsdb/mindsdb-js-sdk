@@ -46,6 +46,7 @@ const SQL = new SQLModule.SqlRestApiClient(
 const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
 const Projects = new ProjectsModule.ProjectsRestApiClient(
+  SQL,
   defaultAxiosInstance,
   httpAuthenticator
 );
