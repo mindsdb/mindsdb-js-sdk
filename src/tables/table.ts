@@ -31,6 +31,16 @@ export default class Table {
   }
 
   /**
+   * Creates a table in an integration from a given SELECT statement.
+   * @param {string} select - SELECT statement to use for populating the new table with data.
+   * @returns {Promise<Table>} - Newly created table.
+   * @throws {MindsDbError} - Something went wrong creating the table.
+   */
+  async create(select: string): Promise<Table> {
+    return await this.tablesApiClient.createTable(this.name, this.integration, select);
+  }
+
+  /**
    * Deletes this table from its integration.
    * @throws {MindsDbError} - Something went wrong deleting this table.
    */
