@@ -74,4 +74,12 @@ export default class ViewsRestApiClient extends ViewsApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
+  /**
+   * Lists all views in the project.
+   * @param {string} project - Project name to get all views from.
+   * @returns {Promise<Array<View>>} - All views for the given project.
+   */
+  async listViews(project: string): Promise<Array<View>> {
+    return this.getAllViews(project);
+  }
 }
