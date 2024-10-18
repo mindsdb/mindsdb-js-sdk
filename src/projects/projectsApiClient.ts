@@ -7,4 +7,11 @@ export default abstract class ProjectsApiClient {
    * @returns {Promise<Array<Project>>} - All projects.
    */
   abstract getAllProjects(): Promise<Array<Project>>;
+
+  /**
+   * Creates a new MindsDB project.
+   * @param {string} name - Name of the project.
+   * @returns {Promise<Project>} - The created project.
+   */
+  abstract createProject(name: string): Promise<Project>;
 }
