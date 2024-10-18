@@ -88,3 +88,28 @@ export default class TablesRestApiClient extends TablesApiClient {
     }
   }
 }
+
+/**
+ * Updates a table in an integration.
+ * @param {string} name - Name of the table to be updated.
+ * @param {string} integration - Name of the integration the table belongs to.
+ * @param {string} updateQuery - The SQL UPDATE query to run for updating the table.
+ * @returns {Promise<void>} - Resolves when the table is updated.
+ * @throws {MindsDbError} - Something went wrong updating the table.
+ */
+override async updateTable(
+  name: string,
+  integration: string,
+  updateQuery: string
+): Promise<void> {
+  // Construct the full SQL query to update the table
+  const sqlQuery = `UPDATE ${mysql.escapeId(integration)}.${mysql.escapeId(name)} SET ${updateQuery}`;
+
+  // Execute the SQL query using the sqlClient
+  const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+
+  // Check for errors
+  if (sqlQueryResult.error_message) {
+    throw new MindsDbError(sqlQueryResult.error_message);
+  }
+}
