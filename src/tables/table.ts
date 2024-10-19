@@ -40,8 +40,6 @@ export default class Table {
 
   /**
    * Deletes specific row (or multiple rows) from the table present in the given integration.
-   * @param {string} name - Name of the table from which data is to be deleted.
-   * @param {string} integration - Name of the integration the table is a part of.
    * @param {string} select - select statement to specify which rows should be deleted.
    * @throws {MindsDbError} - Something went wrong deleting the data from the table.
    */
