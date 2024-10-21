@@ -77,7 +77,7 @@ export default class JobsRestApiClient extends JobsApiClient {
 
     const queryClause = `(${query})`;
     const startClause = `START ${start_at}`;
-    const endClause = `START ${end_at}`;
+    const endClause = `END ${end_at}`;
     const everyClause = `EVERY ${schedule_str}`;
     const ifQueryClause = `IF (${if_query});`
 
