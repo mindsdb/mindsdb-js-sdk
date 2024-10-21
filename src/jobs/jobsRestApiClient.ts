@@ -43,6 +43,25 @@ export default class JobsRestApiClient extends JobsApiClient {
     }
   }
 
+  /**
+   * Creates a new job in the specified project.
+   *
+   * This method constructs and executes a SQL query to create a job
+   * with the provided parameters. If the job already exists, it will 
+   * not be created again. The job will be scheduled to run based on 
+   * the specified timing and conditions.
+   *
+   * @param project - The name of the project where the job will be created.
+   * @param name - The name of the job to be created.
+   * @param query - The SQL query to be executed by the job.
+   * @param if_query - A condition that determines whether the job should run.
+   * @param start_at - The time at which the job should start.
+   * @param end_at - The time at which the job should end.
+   * @param schedule_str - The schedule for how often the job should run.
+   *
+   * @returns A promise that resolves to a new Job instance if successful.
+   * @throws MindsDbError if there is an error executing the SQL query.
+   */
   override async createJob(
     project: string,
     name: string,
