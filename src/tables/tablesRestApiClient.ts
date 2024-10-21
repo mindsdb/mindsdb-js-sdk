@@ -3,6 +3,7 @@ import Table from './table';
 import TablesApiClient from './tablesApiClient';
 import mysql from 'mysql';
 import { MindsDbError } from '../errors';
+import path from 'path';
 
 /** Implementation of TablesApiClient that goes through the REST API */
 export default class TablesRestApiClient extends TablesApiClient {
@@ -87,4 +88,30 @@ export default class TablesRestApiClient extends TablesApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
+
+  /**
+   * Uploads a file to a specified table in an integration.
+   * @param {string} filePath - Path to the file to be uploaded.
+   * @param {string} tableName - Name of the table to upload the file to.
+   * @param {string} integration - Name of the integration the table is a part of.
+   * @throws {MindsDbError} - Something went wrong uploading the file.
+   */
+  override async uploadFile(filePath: string, tableName: string, integration: string): Promise<void> {
+    const fileName = path.basename(filePath);
+
+    const sqlQuery = `
+      LOAD DATA LOCAL INFILE '${fileName}'
+      INTO TABLE ${mysql.escapeId(integration)}.${mysql.escapeId(tableName)}
+      FIELDS TERMINATED BY ',' 
+      ENCLOSED BY '"'
+      LINES TERMINATED BY '\\n'
+      IGNORE 1 ROWS;
+    `;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
 }

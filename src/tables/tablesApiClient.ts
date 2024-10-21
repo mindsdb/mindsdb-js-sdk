@@ -40,4 +40,14 @@ export default abstract class TablesApiClient {
    * @throws {MindsDbError} - Something went wrong deleting the table.
    */
   abstract deleteTable(name: string, integration: string): Promise<void>;
+
+  /**
+   * Uploads a file to a specified table in an integration.
+   * @param {string} filePath - Path to the file to be uploaded.
+   * @param {string} tableName - Name of the table to upload the file to.
+   * @param {string} integration - Name of the integration the table is a part of.
+   * @throws {MindsDbError} - Something went wrong uploading the file.
+   */
+  abstract uploadFile(filePath: string, tableName: string, integration: string): Promise<void>;
+  
 }
