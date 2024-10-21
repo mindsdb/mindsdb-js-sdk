@@ -1,6 +1,7 @@
 import ModelsModule from './models/modelsModule';
 import DatabasesModule from './databases/databasesModule';
 import ProjectsModule from './projects/projectsModule';
+import JobsModule from './jobs/jobsModule';
 import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
 import Constants from './constants';
@@ -26,6 +27,7 @@ import { MindsDbError } from './errors';
 import { BatchQueryOptions, QueryOptions } from './models/queryOptions';
 import { FinetuneOptions, TrainingOptions } from './models/trainingOptions';
 import Project from './projects/project';
+import Job from './jobs/job';
 import SqlQueryResult from './sql/sqlQueryResult';
 import Table from './tables/table';
 import { JsonPrimitive, JsonValue } from './util/json';
@@ -46,6 +48,11 @@ const SQL = new SQLModule.SqlRestApiClient(
 const Databases = new DatabasesModule.DatabasesRestApiClient(SQL);
 const Models = new ModelsModule.ModelsRestApiClient(SQL);
 const Projects = new ProjectsModule.ProjectsRestApiClient(
+  defaultAxiosInstance,
+  httpAuthenticator
+);
+const Jobs = new JobsModule.JobsRestApiClient(
+  SQL,
   defaultAxiosInstance,
   httpAuthenticator
 );
@@ -83,6 +90,7 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   const httpClient = getAxiosInstance(options);
   SQL.client = httpClient;
   Projects.client = httpClient;
+  Jobs.client = httpClient;
   MLEngines.client = httpClient;
   Callbacks.client = httpClient;
 
@@ -114,6 +122,7 @@ export default {
   Databases,
   Models,
   Projects,
+  Jobs,
   Tables,
   Views,
   MLEngines,
@@ -131,6 +140,7 @@ export {
   FinetuneOptions,
   TrainingOptions,
   Project,
+  Job,
   SqlQueryResult,
   Table,
   JsonPrimitive,
