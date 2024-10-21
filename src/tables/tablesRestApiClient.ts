@@ -93,7 +93,7 @@ export default class TablesRestApiClient extends TablesApiClient {
   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
   * @throws {MindsDbError} - Something went wrong inserting data into the table.
   */
-  async insert(name: string, integration: string, data: Array<Array<any>> | string): Promise<void> {
+  async insertTable(name: string, integration: string, data: Array<Array<any>> | string): Promise<void> {
     let sqlQuery = '';
 
     if (Array.isArray(data)) {
