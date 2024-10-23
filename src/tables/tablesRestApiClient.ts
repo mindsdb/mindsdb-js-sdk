@@ -34,6 +34,8 @@ export default class TablesRestApiClient extends TablesApiClient {
     const createClause = `CREATE TABLE ${mysql.escapeId(
       integration
     )}.${mysql.escapeId(name)}`;
+    console.log(`Integration name: ${integration}`);
+    console.log(`Create clause: ${createClause}`);
     const selectClause = `(${select})`;
     const sqlQuery = [createClause, selectClause].join('\n');
 
@@ -93,25 +95,15 @@ export default class TablesRestApiClient extends TablesApiClient {
   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
   * @throws {MindsDbError} - Something went wrong inserting data into the table.
   */
-  async insertTable(name: string, integration: string, data: Array<Array<any>> | string): Promise<void> {
-    let sqlQuery = '';
-
-    if (Array.isArray(data)) {
-      const valuesClause = data.map(
-        (row) => `(${row.map((value) => mysql.escape(value)).join(', ')})`
-      ).join(',\n');
-      
-      sqlQuery = `INSERT INTO ${mysql.escapeId(integration)}.${mysql.escapeId(name)} VALUES ${valuesClause}`;
-    } else if (typeof data === 'string') {
-      sqlQuery = `INSERT INTO ${mysql.escapeId(integration)}.${mysql.escapeId(name)} ${data}`;
-    } else {
-      throw new MindsDbError('Invalid data type. Expected an array of values or a SELECT query.');
-    }
-
-    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
-
-    if (sqlQueryResult.error_message) {
-      throw new MindsDbError(sqlQueryResult.error_message);
+  async insertTable(name: string, integration: string, select: string): Promise<void> {
+    try {
+      const sqlQuery = `INSERT INTO ${mysql.escapeId(integration)}.${mysql.escapeId(name)} (${select})`;
+      const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+      if (sqlQueryResult.error_message) {
+        throw new MindsDbError(sqlQueryResult.error_message);
+      }
+    } catch(error) {
+      throw new MindsDbError(`Insert into a table failed: ${error}`);
     }
   }
 }

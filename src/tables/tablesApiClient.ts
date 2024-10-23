@@ -45,8 +45,8 @@ export default abstract class TablesApiClient {
   * Insert data into this table.
   * @param {string} name - Name of the table to be deleted.
   * @param {string} integration - Name of the integration the table to be deleted is a part of.
-  * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
+  * @param {string} select -  SELECT query to insert data from.
   * @throws {MindsDbError} - Something went wrong inserting data into the table.
   */
-  abstract insertTable(name: string, integration: string, data: Array<Array<any>> | string): Promise<void>;
+  abstract insertTable(name: string, integration: string, select: string): Promise<void>;
 }

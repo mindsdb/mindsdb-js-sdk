@@ -40,10 +40,10 @@ export default class Table {
 
    /**
    * Insert data into this table.
-   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
+   * @param {string} select - SELECT query to insert data from.
    * @throws {MindsDbError} - Something went wrong inserting data into the table.
    */
-   async insert(data: Array<Array<any>> | string): Promise<void> {
-    await this.tablesApiClient.insertTable(this.name, this.integration, data);
+   async insert(select: string): Promise<void> {
+    await this.tablesApiClient.insertTable(this.name, this.integration, select);
   }
 }
