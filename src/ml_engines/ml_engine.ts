@@ -35,6 +35,14 @@ export default class MLEngine {
     this.connection_data = connection_data;
   }
 
+  /**
+   * Lists all mlEngines for the user.
+   * @returns {Promise<Array<MLEngine>>} - List of all mlEngines.
+   */
+  async list(): Promise<Array<MLEngine>> {
+    return this.mlEnginesApiClient.getAllMLEngines();
+  }
+
   /** Deletes this mlEngine.
    *  @throws {MindsDbError} - Something went wrong deleting the mlEngine.
    */
