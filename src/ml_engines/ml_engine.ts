@@ -1,4 +1,5 @@
 import MLEngineApiClient from './ml_enginesApiClient';
+import { Readable } from 'stream';
 
 /**
  * Represents a MindsDB mlEngine and all supported operations.
@@ -35,6 +36,18 @@ export default class MLEngine {
     this.connection_data = connection_data;
   }
 
+  /**
+   * Creates a mlEngine with the given name, engine, and parameters.
+   * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
+   * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
+   * @param {string} [type] - Type of the mlEngine to be created.
+   * @returns {Promise<MLEngine>} - Newly created mlEngine.
+   * @throws {MindsDbError} - Something went wrong creating the mlEngine.
+   */
+  async configure(codeFilePath:string | Readable,modulesFilePath:string | Readable,type:'venv' | 'inhouse'): Promise<void> {
+    await this.mlEnginesApiClient.createMLEngine(this.name,codeFilePath,modulesFilePath,type);
+  }
+  
   /** Deletes this mlEngine.
    *  @throws {MindsDbError} - Something went wrong deleting the mlEngine.
    */
