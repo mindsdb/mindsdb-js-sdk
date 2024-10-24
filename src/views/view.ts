@@ -25,6 +25,16 @@ export default class View {
     this.project = project;
   }
 
+  /**Creates this view in the project.
+   * @param {string} select - SELECT statement to use for populating the new view with data.
+   * @returns {Promise<View>} - Newly created view.
+   * @throws {MindsDbError} - Something went wrong creating this view.
+   */
+  async create(select: string): Promise<View> {
+   return await this.viewsApiClient.createView(this.name, this.project, select);
+  }
+
+
   /** Deletes this view from the project it belongs to.
    *  @throws {MindsDbError} - Something went wrong deleting this view.
    */
