@@ -37,4 +37,13 @@ export default class Table {
   async delete(): Promise<void> {
     await this.tablesApiClient.deleteTable(this.name, this.integration);
   }
+
+   /**
+   * Updates a table from its integration.
+   * @param {string} updateQuery - The SQL UPDATE query to run for updating the table.
+   * @throws {MindsDbError} - Something went wrong deleting the table.
+   */
+   async  update(updateQuery: string): Promise<void> {
+    await this.tablesApiClient.updateTable(this.name, this.integration,updateQuery);
+   }
 }
