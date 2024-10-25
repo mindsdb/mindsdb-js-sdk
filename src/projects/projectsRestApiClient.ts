@@ -15,7 +15,7 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
   /** Axios client to send all HTTP requests. */
   client: Axios;
 
-  /** Authenticator to use for reauthenticating if needed. */
+  /** Authenticator to use for reauthenticate if needed. */
   authenticator: HttpAuthenticator;
 
   /**
