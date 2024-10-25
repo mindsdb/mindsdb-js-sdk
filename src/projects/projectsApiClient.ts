@@ -14,5 +14,4 @@ export default abstract class ProjectsApiClient {
    * @returns {Promise<Project>} - The created project.
    */
   abstract createProject(name: string): Promise<Project>;
-  abstract deleteProject(name: string): Promise<void>;
 }
