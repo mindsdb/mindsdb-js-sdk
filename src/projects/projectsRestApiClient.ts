@@ -77,4 +77,13 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
 
     return new Project(this, name);
   }
+
+  override async deleteProject(name: string): Promise<void> {
+    const sqlQuery = `DROP PROJECT ${name}`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
 }
