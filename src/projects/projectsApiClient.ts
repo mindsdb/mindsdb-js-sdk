@@ -14,4 +14,10 @@ export default abstract class ProjectsApiClient {
    * @returns {Promise<Project>} - The created project.
    */
   abstract createProject(name: string): Promise<Project>;
+
+  /**
+   *
+   * @param {string} name - Name of the project to delete.
+   */
+  abstract deleteProject(name: string): Promise<void>;
 }
