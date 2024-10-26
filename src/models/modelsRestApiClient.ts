@@ -505,7 +505,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   override async setActiveVersion(v: number, project: string, model: Model) {
     const query = `SET model_active = ${mysql.escapeId(project)}.${mysql.escapeId(
       model.name,
-    )}.${mysql.escapeId(v)};`;
+    )}.${mysql.escapeId(v.toString())};`;
     await this.sqlClient
       .runQuery(query)
       .then(
