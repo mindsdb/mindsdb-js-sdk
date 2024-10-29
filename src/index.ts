@@ -12,6 +12,7 @@ import {
   retryUnauthenticatedRequest,
 } from './util/http';
 import TablesModule from './tables/tablesModule';
+import skillsModule from './skills/skillsModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
 
@@ -58,6 +59,7 @@ const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
 );
+const Skills = new skillsModule.SkillsRestApiClient(defaultAxiosInstance);
 const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
