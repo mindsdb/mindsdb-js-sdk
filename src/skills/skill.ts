@@ -14,15 +14,22 @@ export type SkillParams = SQLSkillParams | RetrievalSkillParams;
 export default class Skill {
   name: string;
   type: string;
+  project: string;
   params: SkillParams;
 
-  constructor(name: string, type: string, params: SkillParams) {
+  constructor(
+    name: string,
+    type: string,
+    project: string,
+    params: SkillParams
+  ) {
     this.name = name;
     this.type = type;
+    this.project = project;
     this.params = params;
   }
 
-  static fromJson(json: any): Skill {
+  static fromJson(project: string, json: any): Skill {
     const { name, type, params } = json;
     if (type === 'sql') {
       return new SQLSkill(
@@ -34,7 +41,7 @@ export default class Skill {
     } else if (type === 'retrieval') {
       return new RetrievalSkill(name, params.source, params.description);
     }
-    return new Skill(name, type, params);
+    return new Skill(name, type, project, params);
   }
 
   equals(other: Skill): boolean {
@@ -55,16 +62,22 @@ export class SQLSkill extends Skill {
     name: string,
     tables: string[],
     database: string,
+    project: string,
     description?: string
   ) {
     const params: SQLSkillParams = { database, tables, description };
-    super(name, 'sql', params);
+    super(name, 'sql', project, params);
   }
 }
 
 export class RetrievalSkill extends Skill {
-  constructor(name: string, source: string, description?: string) {
+  constructor(
+    name: string,
+    project: string,
+    source: string,
+    description?: string
+  ) {
     const params: RetrievalSkillParams = { source, description };
-    super(name, 'retrieval', params);
+    super(name, 'retrieval', project, params);
   }
 }
