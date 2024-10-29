@@ -4,6 +4,7 @@ import ProjectsModule from './projects/projectsModule';
 import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
 import Constants from './constants';
+import JobsModule from './jobs/jobsModule';
 import {
   createDefaultAxiosInstance,
   isLocalEndpoint,
@@ -28,6 +29,7 @@ import { FinetuneOptions, TrainingOptions } from './models/trainingOptions';
 import Project from './projects/project';
 import SqlQueryResult from './sql/sqlQueryResult';
 import Table from './tables/table';
+import Job from './jobs/job';
 import { JsonPrimitive, JsonValue } from './util/json';
 import View from './views/view';
 import MLEnginesModule from './ml_engines/ml_enginesModule';
@@ -60,6 +62,12 @@ const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
 );
+const Jobs = new JobsModule.JobsRestApiClient(
+  SQL,
+  defaultAxiosInstance,
+  httpAuthenticator
+);
+
 
 const getAxiosInstance = function (options: ConnectionOptions): Axios {
   const httpClient = options.httpClient || defaultAxiosInstance;
@@ -82,6 +90,7 @@ const getAxiosInstance = function (options: ConnectionOptions): Axios {
 const connect = async function (options: ConnectionOptions): Promise<void> {
   const httpClient = getAxiosInstance(options);
   SQL.client = httpClient;
+  Jobs.client = httpClient;
   Projects.client = httpClient;
   MLEngines.client = httpClient;
   Callbacks.client = httpClient;
@@ -114,6 +123,7 @@ export default {
   Databases,
   Models,
   Projects,
+  Jobs,
   Tables,
   Views,
   MLEngines,
@@ -133,6 +143,7 @@ export {
   Project,
   SqlQueryResult,
   Table,
+  Job,
   JsonPrimitive,
   JsonValue,
   View,
