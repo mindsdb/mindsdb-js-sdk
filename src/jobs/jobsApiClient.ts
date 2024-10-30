@@ -33,4 +33,25 @@ export default abstract class JobsApiClient {
     every?: string,
     ifCondition?: string
   ): Promise<void>;
+
+  /**
+   * Internal method to delete the job in MindsDB.
+   * @param {string} name - Name of the job to delete.
+   * @param {string} project - Project the job will be deleted.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - Something went wrong while deleting the job.
+   */
+  abstract deleteJob(
+    name: string,
+    project: string
+  ): Promise<void>
+
+  /**
+   * Drops (deletes) a job from MindsDB by name.
+   * @param {string} name - Name of the job to drop.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is dropped.
+   * @throws {MindsDbError} - Something went wrong while dropping the job.
+   */
+  abstract dropJob(name: string, project: string): Promise<void>;
 }

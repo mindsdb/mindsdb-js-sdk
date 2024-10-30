@@ -101,7 +101,7 @@ export default class Job {
    * @returns {Promise<void>} - Resolves when the job is created.
    * @throws {MindsDbError} - If job creation fails.
    */
-  async create(): Promise<void> {
+  async createJob(): Promise<void> {
     if (this.queries.length === 0) {
       throw new MindsDbError('No queries added to the job.');
     }
@@ -115,5 +115,25 @@ export default class Job {
       this.every,
       this.ifCondition
     );
+  }
+
+  /**
+   * Deletes the job from MindsDB.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - If job deletion fails.
+   */
+  async deleteJob(): Promise<void> {
+    await this.jobsApiClient.deleteJob(this.name, this.project);
+  }
+
+  /**
+   * Drops (deletes) a job from MindsDB by name.
+   * @param {string} name - Name of the job to drop.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is dropped.
+   * @throws {MindsDbError} - Something went wrong while dropping the job.
+   */
+  async dropJob(name: string, project: string = "mindsdb"): Promise<void> {
+    await this.jobsApiClient.dropJob(name, project);
   }
 }

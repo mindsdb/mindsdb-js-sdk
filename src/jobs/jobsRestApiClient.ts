@@ -22,7 +22,7 @@ export default class JobsRestApiClient extends JobsApiClient {
    * @param {string} project - Project the job belongs to.
    * @returns {Job} - A new Job instance.
    */
-  override create(name: string, project: string): Job {
+  override create(name: string, project: string = "mindsdb"): Job {
     return new Job(this, name, project);
   }
 
@@ -63,6 +63,44 @@ export default class JobsRestApiClient extends JobsApiClient {
     }
 
     const sqlQueryResult = await this.sqlClient.runQuery(createJobQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
+  /**
+   * Internal method to delete the job in MindsDB.
+   * @param {string} name - Name of the job to delete.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - Something went wrong while deleting the job.
+   */
+  override async deleteJob(
+    name: string,
+    project: string
+  ): Promise<void> {
+    const dropJobQuery = `DROP JOB ${mysql.escapeId(project)}.${mysql.escapeId(name)};`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(dropJobQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
+  /**
+   * Internal method to deleting the job in MindsDB with users providing a name
+   * @param {string} name - Name of the job to delete.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - Something went wrong while deleting the job.
+   */
+  override async dropJob(
+    name: string,
+    project: string = "mindsdb"
+  ): Promise<void> {
+    const dropJobQuery = `DROP JOB ${mysql.escapeId(project)}.${mysql.escapeId(name)};`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(dropJobQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
