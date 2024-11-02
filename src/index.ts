@@ -123,6 +123,7 @@ export default {
   Jobs,
   MLEngines,
   Callbacks,
+  Skills,
 };
 export {
   ConnectionOptions,
