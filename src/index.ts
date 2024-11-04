@@ -13,6 +13,7 @@ import {
 } from './util/http';
 import TablesModule from './tables/tablesModule';
 import skillsModule from './skills/skillsModule';
+import knowledgeBaseModule from './knowledge_bases/knowledge_baseModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
 
@@ -60,6 +61,10 @@ const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   httpAuthenticator
 );
 const Skills = new skillsModule.SkillsRestApiClient(defaultAxiosInstance);
+const KnowledgeBases = new knowledgeBaseModule.KnowledgeBaseRestApiClient(
+  SQL,
+  defaultAxiosInstance
+);
 const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
@@ -89,6 +94,7 @@ const connect = async function (options: ConnectionOptions): Promise<void> {
   Projects.client = httpClient;
   MLEngines.client = httpClient;
   Callbacks.client = httpClient;
+  KnowledgeBases.client = httpClient;
 
   if (options.logging) {
     const logger = new Logger(options.logging.logger, options.logging.logLevel);
@@ -124,6 +130,7 @@ export default {
   MLEngines,
   Callbacks,
   Skills,
+  KnowledgeBases,
 };
 export {
   ConnectionOptions,
