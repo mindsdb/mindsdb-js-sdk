@@ -87,4 +87,18 @@ export default class TablesRestApiClient extends TablesApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
+
+  /**
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  override async deleteFile(name: string): Promise<void> {
+    const sqlQuery = `DROP TABLE files.${mysql.escapeId(name)}`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
 }
