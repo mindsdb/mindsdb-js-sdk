@@ -43,6 +43,16 @@ export default class MLEngine {
     return this.mlEnginesApiClient.getAllMLEngines();
   }
 
+    /**
+   * Removes a specified mlEngine by its name.
+   * @param {string} mlEngineName - The name of the mlEngine to remove.
+   * @returns {Promise<void>} - Resolves when the mlEngine is successfully removed.
+   * @throws {MindsDbError} - Something went wrong deleting the mlEngine.
+   */
+  async remove(mlEngineName: string): Promise<void> {
+    await this.mlEnginesApiClient.deleteMLEngine(mlEngineName);
+  }
+
   /** Deletes this mlEngine.
    *  @throws {MindsDbError} - Something went wrong deleting the mlEngine.
    */
