@@ -149,7 +149,7 @@ class Model {
     version: number,
     accuracy?: number,
     tag?: string,
-    active?: boolean
+    active?: boolean,
   ) {
     this.modelsApiClient = modelsApiClient;
     this.name = name;
@@ -168,7 +168,11 @@ class Model {
    * @returns {Array<ModelFeatureDescription>} - All feature descriptions of the model.
    */
   describe(): Promise<Array<ModelFeatureDescription>> {
-    return this.modelsApiClient.describeModel(this.name, this.project, this.version);
+    return this.modelsApiClient.describeModel(
+      this.name,
+      this.project,
+      this.version,
+    );
   }
 
   /**
@@ -185,8 +189,17 @@ class Model {
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
    * @returns {Array<ModelDescribeAttribute>} - Result.
    */
-  describeAttribute(attribute: string, unique_id?: string): Promise<Array<ModelDescribeAttribute>> {
-    return this.modelsApiClient.describeModelAttribute(this.name, this.project, attribute, this.version, unique_id);
+  describeAttribute(
+    attribute: string,
+    unique_id?: string,
+  ): Promise<Array<ModelDescribeAttribute>> {
+    return this.modelsApiClient.describeModelAttribute(
+      this.name,
+      this.project,
+      attribute,
+      this.version,
+      unique_id,
+    );
   }
 
   /**
@@ -209,7 +222,7 @@ class Model {
       this.version,
       this.targetColumn,
       this.project,
-      options
+      options,
     );
   }
 
@@ -225,7 +238,7 @@ class Model {
       this.version,
       this.targetColumn,
       this.project,
-      options
+      options,
     );
   }
 
@@ -240,13 +253,13 @@ class Model {
         this.name,
         this.targetColumn,
         this.project,
-        options
+        options,
       );
     }
     return this.modelsApiClient.retrainModel(
       this.name,
       this.targetColumn,
-      this.project
+      this.project,
     );
   }
 
@@ -258,6 +271,55 @@ class Model {
    */
   finetune(integration: string, options: FinetuneOptions): Promise<Model> {
     return this.modelsApiClient.finetuneModel(this.name, this.project, options);
+  }
+  /**
+   * List all versions of the model.
+   *
+   * @returns {Promise<ModelVersion[]>} - A promise that resolves to an array of ModelVersion objects.
+   */
+  listVersions(): Promise<ModelVersion[]> {
+    return this.modelsApiClient.listVersions(this.project);
+  }
+
+  /**
+   * Get a specific version of the model by its version number.
+   *
+   * @param {number} v - The version number to retrieve.
+   * @returns {Promise<ModelVersion>} - A promise that resolves to the requested ModelVersion.
+   */
+  getVersion(v: number): Promise<ModelVersion> {
+    return this.modelsApiClient.getVersion(
+      Math.floor(v),
+      this.project,
+      this.name,
+    );
+  }
+
+  /**
+   * Drop a specific version of the model.
+   *
+   * @param {number} v - The version number to drop.
+   * @param {string} [project=this.project] - The project name. Defaults to the current project.
+   * @param {string} [model=this.name] - The model name. Defaults to the current model.
+   * @returns {Promise<void>} - A promise that resolves when the version is dropped.
+   */
+  dropVersion(
+    v: number,
+    project: string = this.project,
+    model: string = this.name,
+  ): Promise<void> {
+    return this.modelsApiClient.dropVersion(Math.floor(v), project, model);
+  }
+  /**
+   * Sets the active version of the specified model within a given project.
+   * @param {number} v - The version number to set as active.
+   */
+  setActiveVersion(v: number): Promise<void> {
+    return this.modelsApiClient.setActiveVersion(
+      Math.floor(v),
+      this.project,
+      this,
+    );
   }
 
   /**
@@ -277,9 +339,56 @@ class Model {
       obj['version'],
       obj['accuracy'],
       obj['tag'],
-      obj['active']
+      obj['active'],
     );
   }
 }
 
-export { Model, ModelFeatureDescription, ModelPrediction, ModelRow, ModelDescribeAttribute };
+/**
+ * Represents a MindsDB model with version and all supported operations.
+ */
+class ModelVersion extends Model {
+  /**
+   * Constructor for ModelVersion.
+   *
+   * @param {string} project - Name of the project the model belongs to.
+   * @param {object} data - Data containing the model details.
+   */
+  constructor(
+    project: string,
+    data: {
+      modelsApiClient: ModelsApiClient;
+      name: string;
+      targetColumn: string;
+      status: string;
+      updateStatus: UpdateStatus;
+      version: number;
+      accuracy?: number;
+      tag?: string;
+      active?: boolean;
+    },
+  ) {
+    super(
+      data.modelsApiClient,
+      data.name,
+      project,
+      data.targetColumn,
+      data.status,
+      data.updateStatus,
+      data.version,
+      data.accuracy,
+      data.tag,
+      data.active,
+    );
+    this.version = data.version;
+  }
+}
+
+export {
+  Model,
+  ModelFeatureDescription,
+  ModelPrediction,
+  ModelRow,
+  ModelDescribeAttribute,
+  ModelVersion,
+};
