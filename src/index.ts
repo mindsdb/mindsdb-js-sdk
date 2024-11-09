@@ -3,6 +3,7 @@ import DatabasesModule from './databases/databasesModule';
 import ProjectsModule from './projects/projectsModule';
 import SQLModule from './sql/sqlModule';
 import ViewsModule from './views/viewsModule';
+import JobsModule from './jobs/jobsModule';
 import Constants from './constants';
 import JobsModule from './jobs/jobsModule';
 import {
@@ -53,6 +54,7 @@ const Projects = new ProjectsModule.ProjectsRestApiClient(
 );
 const Tables = new TablesModule.TablesRestApiClient(SQL);
 const Views = new ViewsModule.ViewsRestApiClient(SQL);
+const Jobs = new JobsModule.JobsRestApiClient(SQL);
 const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   SQL,
   defaultAxiosInstance,
@@ -126,6 +128,7 @@ export default {
   Jobs,
   Tables,
   Views,
+  Jobs,
   MLEngines,
   Callbacks,
 };

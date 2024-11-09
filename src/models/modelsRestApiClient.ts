@@ -8,10 +8,10 @@ import {
   ModelFeatureDescription,
   ModelPrediction,
   ModelRow,
+  ModelVersion,
 } from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { MindsDbError } from '../errors';
-import { version } from 'prettier';
 
 /** Implementation of ModelsApiClient that goes through the REST API */
 export default class ModelsRestApiClient extends ModelsApiClient {
@@ -44,7 +44,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   }
 
   private makeTrainingSelectClause(
-    options: TrainingOptions | FinetuneOptions
+    options: TrainingOptions | FinetuneOptions,
   ): string {
     const select = options['select'];
     if (select) {
@@ -74,7 +74,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   }
 
   private makeTrainingWindowHorizonClause(
-    trainingOptions: TrainingOptions
+    trainingOptions: TrainingOptions,
   ): string {
     const window = trainingOptions['window'];
     const horizon = trainingOptions['horizon'];
@@ -101,7 +101,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
             // Escaping WHERE conditions is quite tricky. We should
             // come up with a better solution to indicate WHERE conditions
             // when querying so we aren't passing a raw string.
-            `AND ${o}`
+            `AND ${o}`,
         )
         .join('\n');
     } else {
@@ -110,8 +110,26 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     return whereClause;
   }
 
+  private makeUsingClause (using: string | Array<string>): string {
+    if (!using) {
+      return '';
+    }
+    if (!Array.isArray(using)) {
+      return `USING ${using}\n`;
+    }
+    if (using.length === 0) {
+      return '';
+    }
+    let usingClause = `USING\n`;
+    for (let i = 0; i < using.length - 1; i++) {
+      usingClause += using[i] + `,\n`;
+    }
+    usingClause += using[using.length -1 ] + `\n`;
+    return usingClause;
+  }
+
   private makeTrainingUsingClause(
-    options: FinetuneOptions | TrainingOptions
+    options: FinetuneOptions | TrainingOptions,
   ): string {
     const using = options['using'];
     if (!using) {
@@ -141,7 +159,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   override async getModel(
     name: string,
     project: string,
-    version?: number
+    version?: number,
   ): Promise<Model | undefined> {
     const selectQuery = `SELECT * FROM ${mysql.escapeId(project)}.models${
       version ? '_versions' : ''
@@ -164,7 +182,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     const selectQuery = `SELECT * FROM ${mysql.escapeId(project)}.models`;
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     return sqlQueryResult.rows.map((modelRow) =>
-      Model.fromModelRow(modelRow as ModelRow, this)
+      Model.fromModelRow(modelRow as ModelRow, this),
     );
   }
 
@@ -178,11 +196,11 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   override async describeModel(
     name: string,
     project: string,
-    version?: number
+    version?: number,
   ): Promise<Array<ModelFeatureDescription>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
-      name
-    )}.${ version ? `${mysql.escapeId(version.toString())}.` : ''}\`features\``;
+      name,
+    )}.${version ? `${mysql.escapeId(version.toString())}.` : ''}\`features\``;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
@@ -204,11 +222,11 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     project: string,
     attribute: string,
     version?: number,
-    unique_id?: string
+    unique_id?: string,
   ): Promise<Array<ModelDescribeAttribute>> {
     const describeQuery = `DESCRIBE ${mysql.escapeId(project)}.${mysql.escapeId(
-      name
-    )}.${ version ? `${mysql.escapeId(version.toString())}.` : ''}${mysql.escapeId(attribute)}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
+      name,
+    )}.${version ? `${mysql.escapeId(version.toString())}.` : ''}${mysql.escapeId(attribute)}${unique_id ? `.${mysql.escapeId(unique_id)}` : ''}`;
     const sqlQueryResult = await this.sqlClient.runQuery(describeQuery);
     if (sqlQueryResult.rows.length === 0) {
       return [];
@@ -225,7 +243,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
    */
   override async deleteModel(name: string, project: string): Promise<void> {
     const deleteQuery = `DROP MODEL ${mysql.escapeId(project)}.${mysql.escapeId(
-      name
+      name,
     )}`;
     const sqlQueryResult = await this.sqlClient.runQuery(deleteQuery);
     if (sqlQueryResult.error_message) {
@@ -247,13 +265,14 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     version: number,
     targetColumn: string,
     project: string,
-    options: QueryOptions
+    options: QueryOptions,
   ): Promise<ModelPrediction> {
     const selectClause = `SELECT * FROM ${mysql.escapeId(
-      project
+      project,
     )}.${mysql.escapeId(name)}.${version}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
-    const selectQuery = [selectClause, whereClause].join('\n');
+    const usingClause = this.makeUsingClause(options['using'] || []);
+    const selectQuery = [selectClause, whereClause, usingClause].join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
@@ -281,15 +300,15 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     version: number,
     targetColumn: string,
     project: string,
-    options: BatchQueryOptions
+    options: BatchQueryOptions,
   ): Promise<Array<ModelPrediction>> {
     const selectClause = `SELECT m.${mysql.escapeId(
-      targetColumn
+      targetColumn,
     )} AS predicted, t.*, m.*`;
     const joinId = options['join'];
     const fromClause = `FROM ${mysql.escapeId(joinId)} AS t`;
     const joinClause = `JOIN ${mysql.escapeId(project)}.${mysql.escapeId(
-      name
+      name,
     )}.${version} AS m`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const limitClause = options['limit']
@@ -325,7 +344,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    trainingOptions: TrainingOptions
+    trainingOptions: TrainingOptions,
   ): Promise<Model> {
     const createClause = this.makeTrainingCreateClause(name, project);
     const fromClause = this.makeTrainingFromClause(trainingOptions);
@@ -360,7 +379,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       targetColumn,
       'generating',
       'up_to_date',
-      1
+      1,
     );
   }
 
@@ -377,7 +396,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    trainingOptions?: TrainingOptions
+    trainingOptions?: TrainingOptions,
   ): Promise<Model> {
     const retrainClause = this.makeRetrainClause(name, project);
     let query = retrainClause;
@@ -422,10 +441,10 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   override async finetuneModel(
     name: string,
     project: string,
-    finetuneOptions: FinetuneOptions
+    finetuneOptions: FinetuneOptions,
   ): Promise<Model> {
     const finetuneClause = `FINETUNE ${mysql.escapeId(project)}.${mysql.escapeId(
-      name
+      name,
     )} FROM ${mysql.escapeId(finetuneOptions['integration'])}`;
     const selectClause = this.makeTrainingSelectClause(finetuneOptions);
     const usingClause = this.makeTrainingUsingClause(finetuneOptions);
@@ -436,5 +455,83 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     }
 
     return Model.fromModelRow(sqlQueryResult.rows[0] as ModelRow, this);
+  }
+
+  /**
+   * List all versions of the model in the specified project.
+   *
+   * @param {string} project - The project to list the model versions from.
+   * @returns {Promise<ModelVersion[]>} - A promise that resolves to an array of ModelVersion objects.
+   */
+  override async listVersions(project: string): Promise<ModelVersion[]> {
+    const allModels = await this.getAllModels(project);
+    return allModels.map((model: any) => new ModelVersion(project, model));
+  }
+
+  /**
+   * Get a specific version of the model by its version number and name.
+   *
+   * @param {number} v - The version number to retrieve.
+   * @param {string} project - The project name.
+   * @param {string} name - The model name.
+   * @returns {Promise<ModelVersion>} - A promise that resolves to the requested ModelVersion.
+   * @throws {Error} - Throws an error if the version is not found.
+   */
+  override async getVersion(
+    v: number,
+    project: string,
+    name: string,
+  ): Promise<ModelVersion> {
+    const allModels = await this.listVersions(project);
+    for (const model of allModels) {
+      if (model.version === v && model.name === name) {
+        return model;
+      }
+    }
+    throw new Error('Version is not found');
+  }
+
+  /**
+   * Drop a specific version of the model in the given project.
+   *
+   * @param {number} v - The version number to drop.
+   * @param {string} project - The project name.
+   * @param {string} model - The model name.
+   * @returns {Promise<void>} - A promise that resolves when the version is dropped.
+   * @throws {MindsDbError} - Throws an error if something goes wrong during the operation.
+   */
+  override async dropVersion(
+    v: number,
+    project: string,
+    model: string,
+  ): Promise<void> {
+    const deleteQuery = `DROP MODEL ${mysql.escapeId(project)}.${mysql.escapeId(
+      model,
+    )}.${mysql.escapeId(v)}`;
+    const sqlQueryResult = await this.sqlClient.runQuery(deleteQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
+  /**
+   * Sets the active version of the specified model within a given project.
+   * @param {number} v - The version number to set as active.
+   * @param {string} project - The name of the project the model belongs to.
+   * @param {Model} model - The model for which to set the active version.
+   * @throws {MindsDbError} - If an error occurs while setting the active version.
+   */
+  override async setActiveVersion(v: number, project: string, model: Model) {
+    const query = `SET model_active = ${mysql.escapeId(project)}.${mysql.escapeId(
+      model.name,
+    )}.${mysql.escapeId(v.toString())};`;
+    await this.sqlClient
+      .runQuery(query)
+      .then(
+        async () =>
+          (model =
+            (await this.getModel(model.name, project)) ??
+            new ModelVersion(project, { ...model, version: v })),
+      );
   }
 }
