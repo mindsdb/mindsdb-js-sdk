@@ -1,33 +1,110 @@
-import { Axios } from 'axios';
-import JobsApiClient from './jobsApiClient';
 import mysql from 'mysql';
-import Job from './job';
-import SqlApiClient from '../sql/sqlApiClient';
-import HttpAuthenticator from '../httpAuthenticator';
 import { MindsDbError } from '../errors';
 
-/** Implementation of JobsApiClient that goes through the REST API. */
+import SqlApiClient from '../sql/sqlApiClient';
+import Job from './job';
+import JobsApiClient from './jobsApiClient';
+
 export default class JobsRestApiClient extends JobsApiClient {
-  /** Axios client to send all HTTP requests. */
-  client: Axios;
-
-  /** Authenticator to use for reauthenticating if needed. */
-  authenticator: HttpAuthenticator;
-
-  /** SQL API client to send all SQL query requests. */
   sqlClient: SqlApiClient;
 
   /**
-   * Constructor for Jobs API client.
-   * @param {Axios} client - Axios instance to send all HTTP requests.
+   * @param {SqlApiClient} sqlClient - SQL API client to send all SQL query requests.
    */
-  constructor(client: Axios, authenticator: HttpAuthenticator, sqlClient: SqlApiClient) {
+  constructor(sqlClient: SqlApiClient) {
     super();
-    this.client = client;
-    this.authenticator = authenticator;
     this.sqlClient = sqlClient;
   }
 
+  /**
+   * Creates a new Job instance for building and creating a job.
+   * @param {string} name - Name of the job.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Job} - A new Job instance.
+   */
+  override create(name: string, project: string = "mindsdb"): Job {
+    return new Job(this, name, project);
+  }
+
+  /**
+   * Internal method to create the job in MindsDB.
+   * @param {string} name - Name of the job to create.
+   * @param {string} project - Project the job will be created in.
+   * @param {string} query - Queries to be executed by the job.
+   * @param {string} [start] - Optional start date for the job.
+   * @param {string} [end] - Optional end date for the job.
+   * @param {string} [every] - Optional repetition frequency.
+   * @param {string} [ifCondition] - Optional condition for job execution.
+   * @returns {Promise<void>} - Resolves when the job is created.
+   * @throws {MindsDbError} - Something went wrong while creating the job.
+   */
+  override async createJob(
+    name: string,
+    project: string,
+    query: string,
+    start?: string,
+    end?: string,
+    every?: string,
+    ifCondition?: string
+  ): Promise<void> {
+    let createJobQuery = `CREATE JOB ${mysql.escapeId(project)}.${mysql.escapeId(name)} (\n${query}\n)`;
+
+    if (start) {
+      createJobQuery += `\nSTART '${start}'`;
+    }
+    if (end) {
+      createJobQuery += `\nEND '${end}'`;
+    }
+    if (every) {
+      createJobQuery += `\nEVERY ${every}`;
+    }
+    if (ifCondition) {
+      createJobQuery += `\nIF (\n${ifCondition}\n)`;
+    }
+
+    const sqlQueryResult = await this.sqlClient.runQuery(createJobQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
+  /**
+   * Internal method to delete the job in MindsDB.
+   * @param {string} name - Name of the job to delete.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - Something went wrong while deleting the job.
+   */
+  override async deleteJob(
+    name: string,
+    project: string
+  ): Promise<void> {
+    const dropJobQuery = `DROP JOB ${mysql.escapeId(project)}.${mysql.escapeId(name)};`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(dropJobQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+
+  /**
+   * Internal method to deleting the job in MindsDB with users providing a name
+   * @param {string} name - Name of the job to delete.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves when the job is deleted.
+   * @throws {MindsDbError} - Something went wrong while deleting the job.
+   */
+  override async dropJob(
+    name: string,
+    project: string = "mindsdb"
+  ): Promise<void> {
+    const dropJobQuery = `DROP JOB ${mysql.escapeId(project)}.${mysql.escapeId(name)};`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(dropJobQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
 
   /**
      * Retrieves a list of jobs from the information schema.
@@ -72,9 +149,16 @@ export default class JobsRestApiClient extends JobsApiClient {
         throw new MindsDbError(sqlQueryResult.error_message);
     }
     return sqlQueryResult.rows.map(
-        (r) => new Job(r['NAME'], r['QUERY'], r['IF_QUERY'], r['START_AT'], r['END_AT'], r['SCHEDULE_STR'])
+        (row) => {
+            const job = new Job(this, row['NAME'], row['PROJECT']);
+            job.setEnd(row['END_AT']);
+            job.setEvery(row['SCHEDULE_STR']);
+            job.setStart(row['START_AT']);
+            job.setIfCondition(row['IF_QUERY']);
+            job.addQuery(row['QUERY']);
+            return job;
+        }
       );
-
   }
 
 }
