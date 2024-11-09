@@ -12,6 +12,7 @@ import {
   retryUnauthenticatedRequest,
 } from './util/http';
 import TablesModule from './tables/tablesModule';
+import AgentsModule from './agents/agentsModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
 
@@ -58,6 +59,7 @@ const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
 );
+const Agents = new AgentsModule.AgentsRestApiClient(defaultAxiosInstance);
 const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
@@ -120,6 +122,7 @@ export default {
   Views,
   Jobs,
   MLEngines,
+  Agents,
   Callbacks,
 };
 export {
