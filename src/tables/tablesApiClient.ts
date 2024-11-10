@@ -42,6 +42,7 @@ export default abstract class TablesApiClient {
   abstract deleteTable(name: string, integration: string): Promise<void>;
 
 
+
   /**
    * Updates a table from its integration.
    * @param {string} name - Name of the table to be updated.
@@ -54,4 +55,12 @@ export default abstract class TablesApiClient {
     integration: string,
     updateQuery: string
   ): Promise<void>;
+
+  /**
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  abstract deleteFile(name: string): Promise<void>;
+
 }

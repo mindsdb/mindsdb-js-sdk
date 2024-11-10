@@ -1,4 +1,10 @@
-import { Model, ModelDescribeAttribute, ModelFeatureDescription, ModelPrediction } from './model';
+import {
+  Model,
+  ModelDescribeAttribute,
+  ModelFeatureDescription,
+  ModelPrediction,
+  ModelVersion,
+} from './model';
 import { BatchQueryOptions, QueryOptions } from './queryOptions';
 import { FinetuneOptions, TrainingOptions } from './trainingOptions';
 
@@ -31,7 +37,7 @@ export default abstract class ModelsApiClient {
   abstract describeModel(
     name: string,
     project: string,
-    version?: number
+    version?: number,
   ): Promise<Array<ModelFeatureDescription>>;
 
   /**
@@ -48,7 +54,7 @@ export default abstract class ModelsApiClient {
     project: string,
     attribute: string,
     version?: number,
-    unique_id?: string
+    unique_id?: string,
   ): Promise<Array<ModelDescribeAttribute>>;
 
   /**
@@ -74,7 +80,7 @@ export default abstract class ModelsApiClient {
     version: number,
     targetColumn: string,
     project: string,
-    options: QueryOptions
+    options: QueryOptions,
   ): Promise<ModelPrediction>;
 
   /**
@@ -91,7 +97,7 @@ export default abstract class ModelsApiClient {
     version: number,
     targetColumn: string,
     project: string,
-    options: BatchQueryOptions
+    options: BatchQueryOptions,
   ): Promise<Array<ModelPrediction>>;
 
   /**
@@ -106,7 +112,7 @@ export default abstract class ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    options: TrainingOptions
+    options: TrainingOptions,
   ): Promise<Model>;
 
   /**
@@ -121,7 +127,7 @@ export default abstract class ModelsApiClient {
     name: string,
     targetColumn: string,
     project: string,
-    options?: TrainingOptions
+    options?: TrainingOptions,
   ): Promise<Model>;
 
   /**
@@ -134,6 +140,56 @@ export default abstract class ModelsApiClient {
   abstract finetuneModel(
     name: string,
     project: string,
-    options?: FinetuneOptions
+    options?: FinetuneOptions,
   ): Promise<Model>;
+  /**
+   * Lists all versions of the model in the specified project.
+   *
+   * @param {string} project - The project to list the model versions from.
+   * @returns {Promise<ModelVersion[]>} - A promise that resolves to an array of ModelVersion objects.
+   */
+  abstract listVersions(project: string): Promise<ModelVersion[]>;
+
+  /**
+   * Gets a specific version of the model by its version number and name.
+   *
+   * @param {number} v - The version number to retrieve.
+   * @param {string} project - The project name.
+   * @param {string} name - The model name.
+   * @returns {Promise<ModelVersion>} - A promise that resolves to the requested ModelVersion.
+   * @throws {Error} - Throws an error if the version is not found.
+   */
+  abstract getVersion(
+    v: number,
+    project: string,
+    name: string,
+  ): Promise<ModelVersion>;
+
+  /**
+   * Drops a specific version of the model in the given project.
+   *
+   * @param {number} v - The version number to drop.
+   * @param {string} project - The project name.
+   * @param {string} model - The model name.
+   * @returns {Promise<void>} - A promise that resolves when the version is dropped.
+   * @throws {MindsDbError} - Throws an error if something goes wrong during the operation.
+   */
+  abstract dropVersion(
+    v: number,
+    project: string,
+    model: string,
+  ): Promise<void>;
+
+  /**
+   * Sets the active version of the specified model within a given project.
+   * @param {number} v - The version number to set as active.
+   * @param {string} project - The name of the project the model belongs to.
+   * @param {string} model - The name of the model for which to set the active version.
+   * @throws {MindsDbError} - If an error occurs while setting the active version.
+   */
+  abstract setActiveVersion(
+    v: number,
+    project: string,
+    model: Model,
+  ): Promise<void>;
 }
