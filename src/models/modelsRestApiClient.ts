@@ -507,7 +507,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
   ): Promise<void> {
     const deleteQuery = `DROP MODEL ${mysql.escapeId(project)}.${mysql.escapeId(
       model,
-    )}.${mysql.escapeId(v.toString())}`;
+    )}.${mysql.escapeId(v)}`;
     const sqlQueryResult = await this.sqlClient.runQuery(deleteQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
