@@ -42,6 +42,7 @@ export default abstract class TablesApiClient {
   abstract deleteTable(name: string, integration: string): Promise<void>;
 
   /**
+
    * Deletes specific row (or multiple rows) from the table present in the given integration.
    * @param {string} name - Name of the table from which data is to be deleted.
    * @param {string} integration - Name of the integration the table is a part of.
@@ -49,5 +50,12 @@ export default abstract class TablesApiClient {
    * @throws {MindsDbError} - Something went wrong deleting the data from the table.
    */
   abstract deleteFromTable(name: string, integration: string, select?: string): Promise<void>;
+
+   /*
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  abstract deleteFile(name: string): Promise<void>;
 
 }

@@ -89,6 +89,7 @@ export default class TablesRestApiClient extends TablesApiClient {
   }
 
   /**
+
    * Deletes specific row (or multiple rows) from the table present in the given integration.
    * @param {string} name - Name of the table from which data is to be deleted.
    * @param {string} integration - Name of the integration the table is a part of.
@@ -102,7 +103,22 @@ export default class TablesRestApiClient extends TablesApiClient {
     */
     const sqlQuery = select ?? `DELETE FROM TABLE ${mysql.escapeId(
       integration
-    )}.${mysql.escapeId(name)}`; 
+    )}.${mysql.escapeId(name)}`;
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+  
+  
+   /*
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  override async deleteFile(name: string): Promise<void> {
+    const sqlQuery = `DROP TABLE files.${mysql.escapeId(name)}`;
+
 
     const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
     if (sqlQueryResult.error_message) {
