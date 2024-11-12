@@ -128,6 +128,23 @@ export default class TablesRestApiClient extends TablesApiClient {
     return filesUrl.toString();
   }
   
+  /**
+   * Uploads a file asynchronously to a specified location.
+   *
+   * This method handles the process of uploading a file to a server or cloud storage. It requires the path to the
+   * file on the local filesystem, the desired name for the uploaded file, and optionally, the original name of the file.
+   * The file will be uploaded with the specified file name, but the original file name can be preserved if provided.
+   *
+   * @param {string} filePath - The local path to the file to be uploaded.
+   * @param {string} fileName - The desired name for the file once it is uploaded.
+   * @param {string} [original_file_name] - (Optional) The original name of the file before renaming. This is typically
+   * used for logging, tracking, or maintaining the original file's identity.
+   * 
+   * @returns {Promise<void>} A promise that resolves when the file upload is complete. If the upload fails,
+   * an error will be thrown.
+   *
+   * @throws {Error} If there is an issue with the upload, such as network errors, permission issues, or invalid file paths.
+   */
   override async uploadFile(filePath: string, fileName: string, original_file_name ?: string): Promise<void> {
     const formData = new FormData();
 
