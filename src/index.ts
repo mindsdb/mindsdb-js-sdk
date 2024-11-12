@@ -50,7 +50,7 @@ const Projects = new ProjectsModule.ProjectsRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
 );
-const Tables = new TablesModule.TablesRestApiClient(SQL);
+const Tables = new TablesModule.TablesRestApiClient(SQL, defaultAxiosInstance, httpAuthenticator);
 const Views = new ViewsModule.ViewsRestApiClient(SQL);
 const Jobs = new JobsModule.JobsRestApiClient(SQL);
 const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
