@@ -105,4 +105,60 @@ export default class JobsRestApiClient extends JobsApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
+
+  /**
+     * Retrieves a list of jobs from the information schema.
+     *
+     * This asynchronous method queries the database for jobs, optionally filtering
+     * by project name and/or job name. If both parameters are provided, the method
+     * combines the filters to return a more specific list of jobs.
+     *
+     * @param {string} [name] - The optional name of the job to filter the results. 
+     *                           If provided, only jobs matching this name will be included.
+     * @param {string} [project] - The optional project name to filter the results. 
+     *                              If provided, only jobs associated with this project will be included.
+     *
+     * @returns {Promise<Array<Job>>} - A promise that resolves to an array of Job objects 
+     *                                   representing the jobs retrieved from the database.
+     * 
+     * @throws {MindsDbError} - Throws an error if the SQL query execution fails, 
+     *                          containing the error message returned from the database.
+     *
+     * @example
+     * const jobs = await list('myJob', 'myProject');
+     * console.log(jobs);
+ */
+  override async list(name?: string, project?: string): Promise<Array<Job>> {
+    const selectClause = `SELECT * FROM information_schema.jobs`;
+    let projectClause = '';
+    let nameClause = '';
+    if(project){
+        projectClause = `WHERE project = ${mysql.escape(project)}`;
+    }
+
+    if(name){
+        nameClause = `name = ${mysql.escape(name)}`;
+    }
+
+    const listJobsQuery = [selectClause, projectClause, nameClause].join(
+        '\n'
+    );
+
+    const sqlQueryResult = await this.sqlClient.runQuery(listJobsQuery);
+    if (sqlQueryResult.error_message) {
+        throw new MindsDbError(sqlQueryResult.error_message);
+    }
+    return sqlQueryResult.rows.map(
+        (row) => {
+            const job = new Job(this, row['NAME'], row['PROJECT']);
+            job.setEnd(row['END_AT']);
+            job.setEvery(row['SCHEDULE_STR']);
+            job.setStart(row['START_AT']);
+            job.setIfCondition(row['IF_QUERY']);
+            job.addQuery(row['QUERY']);
+            return job;
+        }
+      );
+  }
+
 }
