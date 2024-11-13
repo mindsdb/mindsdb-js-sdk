@@ -34,8 +34,6 @@ export default class TablesRestApiClient extends TablesApiClient {
     const createClause = `CREATE TABLE ${mysql.escapeId(
       integration
     )}.${mysql.escapeId(name)}`;
-    console.log(`Integration name: ${integration}`);
-    console.log(`Create clause: ${createClause}`);
     const selectClause = `(${select})`;
     const sqlQuery = [createClause, selectClause].join('\n');
 
