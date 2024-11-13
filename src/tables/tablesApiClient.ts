@@ -40,4 +40,11 @@ export default abstract class TablesApiClient {
    * @throws {MindsDbError} - Something went wrong deleting the table.
    */
   abstract deleteTable(name: string, integration: string): Promise<void>;
+
+  /**
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  abstract deleteFile(name: string): Promise<void>;
 }
