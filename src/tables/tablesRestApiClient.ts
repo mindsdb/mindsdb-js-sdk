@@ -95,7 +95,7 @@ export default class TablesRestApiClient extends TablesApiClient {
   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
   * @throws {MindsDbError} - Something went wrong inserting data into the table.
   */
-  async insertTable(name: string, integration: string, select: string): Promise<void> {
+  override async insertTable(name: string, integration: string, select: string): Promise<void> {
     try {
       const sqlQuery = `INSERT INTO ${mysql.escapeId(integration)}.${mysql.escapeId(name)} (${select})`;
       const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
@@ -104,6 +104,20 @@ export default class TablesRestApiClient extends TablesApiClient {
       }
     } catch(error) {
       throw new MindsDbError(`Insert into a table failed: ${error}`);
+    }
+  }
+  
+  /**
+   * Deletes a file from the files integration.
+   * @param {string} name - Name of the file to be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the file.
+   */
+  override async deleteFile(name: string): Promise<void> {
+    const sqlQuery = `DROP TABLE files.${mysql.escapeId(name)}`;
+
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
 }
