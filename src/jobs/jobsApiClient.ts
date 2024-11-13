@@ -54,4 +54,13 @@ export default abstract class JobsApiClient {
    * @throws {MindsDbError} - Something went wrong while dropping the job.
    */
   abstract dropJob(name: string, project: string): Promise<void>;
+
+  /**
+   * Lists all jobs from MindsDB.
+   * @param {string} name - Name of the job.
+   * @param {string} project - Project the job belongs to.
+   * @returns {Promise<void>} - Resolves after all the jobs are listed.
+   * @throws {MindsDbError} - Something went wrong while listing the job.
+   */
+  abstract list(name?: string, project?: string): Promise<Array<Job>>;
 }
