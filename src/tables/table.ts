@@ -29,7 +29,13 @@ export default class Table {
     this.name = name;
     this.integration = integration;
   }
-
+  /**
+   * Removes this table from its integration.
+   * @throws {MindsDbError} - Something went wrong removing this table.
+   */
+  async removeTable(): Promise<void> {
+    await this.tablesApiClient.removeTable(this.name, this.integration);
+  }
   /**
    * Creates a table in an integration from a given SELECT statement.
    * @param {string} select - SELECT statement to use for populating the new table with data.

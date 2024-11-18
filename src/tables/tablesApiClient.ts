@@ -56,3 +56,13 @@ export default abstract class TablesApiClient {
    */
   abstract deleteFile(name: string): Promise<void>;
 }
+
+/**
+ * Removes a table from its integration.
+ * @param {string} name - Name of the table to be removed.
+ * @param {string} integration - Name of the integration the table belongs to.
+ * @returns {Promise<void>} - Resolves when the table is successfully removed.
+ * @throws {MindsDbError} - Something went wrong removing the table.
+ */
+abstract removeTable(name: string, integration: string): Promise<void>;
+

@@ -119,3 +119,27 @@ export default class TablesRestApiClient extends TablesApiClient {
     }
   }
 }
+
+/**
+ * Removes a table from its integration.
+ * @param {string} name - Name of the table to be removed.
+ * @param {string} integration - Name of the integration the table belongs to.
+ * @returns {Promise<void>} - Resolves when the table is successfully removed.
+ * @throws {MindsDbError} - Something went wrong removing the table.
+ */
+override async removeTable(
+  name: string,
+  integration: string
+): Promise<void> {
+  // Construct the SQL query to drop the table
+  const sqlQuery = `DROP TABLE ${mysql.escapeId(integration)}.${mysql.escapeId(name)}`;
+
+  // Execute the SQL query using the sqlClient
+  const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+
+  // Check for errors
+  if (sqlQueryResult.error_message) {
+    throw new MindsDbError(sqlQueryResult.error_message);
+  }
+}
+
