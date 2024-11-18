@@ -47,4 +47,13 @@ export default class Table {
   async delete(): Promise<void> {
     await this.tablesApiClient.deleteTable(this.name, this.integration);
   }
+
+   /**
+   * Insert data into this table.
+   * @param {string} select - SELECT query to insert data from.
+   * @throws {MindsDbError} - Something went wrong inserting data into the table.
+   */
+   async insert(select: string): Promise<void> {
+    await this.tablesApiClient.insertTable(this.name, this.integration, select);
+  }
 }
