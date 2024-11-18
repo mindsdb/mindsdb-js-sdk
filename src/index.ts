@@ -12,7 +12,6 @@ import {
   retryUnauthenticatedRequest,
 } from './util/http';
 import TablesModule from './tables/tablesModule';
-import skillsModule from './skills/skillsModule';
 import knowledgeBaseModule from './knowledge_bases/knowledge_baseModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
@@ -61,7 +60,6 @@ const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
 );
-const Skills = new skillsModule.SkillsRestApiClient(defaultAxiosInstance);
 const KnowledgeBases = new knowledgeBaseModule.KnowledgeBaseRestApiClient(
   SQL,
   defaultAxiosInstance
@@ -130,7 +128,6 @@ export default {
   Jobs,
   MLEngines,
   Callbacks,
-  Skills,
   KnowledgeBases,
 };
 export {
