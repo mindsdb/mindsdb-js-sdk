@@ -89,22 +89,28 @@ export default class TablesRestApiClient extends TablesApiClient {
   }
 
   /**
-  * Insert data into this table.
-  * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
-  * @throws {MindsDbError} - Something went wrong inserting data into the table.
-  */
-  override async insertTable(name: string, integration: string, select: string): Promise<void> {
+   * Insert data into this table.
+   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
+   * @throws {MindsDbError} - Something went wrong inserting data into the table.
+   */
+  override async insertTable(
+    name: string,
+    integration: string,
+    select: string
+  ): Promise<void> {
     try {
-      const sqlQuery = `INSERT INTO ${mysql.escapeId(integration)}.${mysql.escapeId(name)} (${select})`;
+      const sqlQuery = `INSERT INTO ${mysql.escapeId(
+        integration
+      )}.${mysql.escapeId(name)} (${select})`;
       const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
       if (sqlQueryResult.error_message) {
         throw new MindsDbError(sqlQueryResult.error_message);
       }
-    } catch(error) {
+    } catch (error) {
       throw new MindsDbError(`Insert into a table failed: ${error}`);
     }
   }
-  
+
   /**
    * Deletes a file from the files integration.
    * @param {string} name - Name of the file to be deleted.
@@ -118,28 +124,26 @@ export default class TablesRestApiClient extends TablesApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
-}
 
-/**
- * Removes a table from its integration.
- * @param {string} name - Name of the table to be removed.
- * @param {string} integration - Name of the integration the table belongs to.
- * @returns {Promise<void>} - Resolves when the table is successfully removed.
- * @throws {MindsDbError} - Something went wrong removing the table.
- */
-override async removeTable(
-  name: string,
-  integration: string
-): Promise<void> {
-  // Construct the SQL query to drop the table
-  const sqlQuery = `DROP TABLE ${mysql.escapeId(integration)}.${mysql.escapeId(name)}`;
+  /**
+   * Removes a table from its integration.
+   * @param {string} name - Name of the table to be removed.
+   * @param {string} integration - Name of the integration the table belongs to.
+   * @returns {Promise<void>} - Resolves when the table is successfully removed.
+   * @throws {MindsDbError} - Something went wrong removing the table.
+   */
+  override async removeTable(name: string, integration: string): Promise<void> {
+    // Construct the SQL query to drop the table
+    const sqlQuery = `DROP TABLE ${mysql.escapeId(
+      integration
+    )}.${mysql.escapeId(name)}`;
 
-  // Execute the SQL query using the sqlClient
-  const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    // Execute the SQL query using the sqlClient
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
 
-  // Check for errors
-  if (sqlQueryResult.error_message) {
-    throw new MindsDbError(sqlQueryResult.error_message);
+    // Check for errors
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
   }
 }
-
