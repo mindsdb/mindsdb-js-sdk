@@ -107,7 +107,7 @@ export default class TablesRestApiClient extends TablesApiClient {
     }
   }
 
-  
+
   /**
    * Updates a table from its integration.
    * @param {string} name - Name of the table to be updated.
@@ -121,26 +121,26 @@ export default class TablesRestApiClient extends TablesApiClient {
     updateQuery: string
   ): Promise<void> {
 
-    let keyword="SET";
+    let keyword = "SET";
     let setPosition = updateQuery.toUpperCase().indexOf(keyword);
     let result;
 
     if (setPosition !== -1) {
-    // Extract the substring starting just after "SET"
-     result = updateQuery.substring(setPosition + keyword.length).trim();
-    } 
+      // Extract the substring starting just after "SET"
+      result = updateQuery.substring(setPosition + keyword.length).trim();
+    }
 
     // Construct the full SQL query to update the table
     const sqlQuery = `UPDATE ${mysql.escapeId(integration)}.${mysql.escapeId(name)} SET ${result}`;
-  
+
     // Execute the SQL query using the sqlClient
     const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
-    
- 
+
+
   /*
    * Deletes specific row (or multiple rows) from the table present in the given integration.
    * @param {string} name - Name of the table from which data is to be deleted.
@@ -148,7 +148,7 @@ export default class TablesRestApiClient extends TablesApiClient {
    * @param {string} select - select statement to specify which rows should be deleted.
    * @throws {MindsDbError} - Something went wrong deleting the data from the table.
    */
-  override async deleteFromTable(name: string, integration: string,select?:string): Promise<void> { 
+  override async deleteFromTable(name: string, integration: string, select?: string): Promise<void> {
     /** 
     If select parameter is not passed then entire data from the table is deleted.
     */
@@ -160,13 +160,13 @@ export default class TablesRestApiClient extends TablesApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
-  
-  
-   /*
-  * Insert data into this table.
-  * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
-  * @throws {MindsDbError} - Something went wrong inserting data into the table.
-  */
+
+
+  /*
+ * Insert data into this table.
+ * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
+ * @throws {MindsDbError} - Something went wrong inserting data into the table.
+ */
   override async insertTable(name: string, integration: string, select: string): Promise<void> {
     try {
       const sqlQuery = `INSERT INTO ${mysql.escapeId(
@@ -202,7 +202,7 @@ export default class TablesRestApiClient extends TablesApiClient {
     const filesUrl = new URL(Constants.FILES_URI, baseUrl);
     return filesUrl.toString();
   }
-  
+
   /**
    * Uploads a file asynchronously to a specified location.
    *
@@ -220,10 +220,10 @@ export default class TablesRestApiClient extends TablesApiClient {
    *
    * @throws {Error} If there is an issue with the upload, such as network errors, permission issues, or invalid file paths.
    */
-  override async uploadFile(filePath: string, fileName: string, original_file_name ?: string): Promise<void> {
+  override async uploadFile(filePath: string, fileName: string, original_file_name?: string): Promise<void> {
     const formData = new FormData();
 
-    if(original_file_name)
+    if (original_file_name)
       formData.append('original_file_name', original_file_name);
 
     if (fs.existsSync(filePath)) {

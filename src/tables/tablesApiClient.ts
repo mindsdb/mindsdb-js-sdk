@@ -53,7 +53,7 @@ export default abstract class TablesApiClient {
     integration: string,
     updateQuery: string
   ): Promise<void>;
-  
+
   /*
    * Deletes specific row (or multiple rows) from the table present in the given integration.
    * @param {string} name - Name of the table from which data is to be deleted.
@@ -90,5 +90,5 @@ export default abstract class TablesApiClient {
    * 
    * @throws {Error} - If there is an error during the file upload process, the promise is rejected with an error message.
    */
-  abstract uploadFile(filePath: string, fileName: string, original_file_name ?: string): Promise<void>;
+  abstract uploadFile(filePath: string, fileName: string, original_file_name?: string): Promise<void>;
 }
