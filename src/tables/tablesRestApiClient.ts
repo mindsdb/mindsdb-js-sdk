@@ -88,6 +88,40 @@ export default class TablesRestApiClient extends TablesApiClient {
     }
   }
 
+  
+  /**
+   * Updates a table from its integration.
+   * @param {string} name - Name of the table to be updated.
+   * @param {string} integration - Name of the integration the table to be updated is a part of.
+   * @param {string} updateQuery - The SQL UPDATE query to run for updating the table.
+   * @throws {MindsDbError} - Something went wrong deleting the table.
+   */
+  override async updateTable(
+    name: string,
+    integration: string,
+    updateQuery: string
+  ): Promise<void> {
+
+    let keyword="SET";
+    let setPosition = updateQuery.toUpperCase().indexOf(keyword);
+    let result;
+
+    if (setPosition !== -1) {
+    // Extract the substring starting just after "SET"
+     result = updateQuery.substring(setPosition + keyword.length).trim();
+    } 
+
+    // Construct the full SQL query to update the table
+    const sqlQuery = `UPDATE ${mysql.escapeId(integration)}.${mysql.escapeId(name)} SET ${result}`;
+  
+    // Execute the SQL query using the sqlClient
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+    
+ 
   /**
    * Deletes specific row (or multiple rows) from the table present in the given integration.
    * @param {string} name - Name of the table from which data is to be deleted.

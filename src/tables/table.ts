@@ -64,6 +64,16 @@ export default class Table {
   }
 
    /**
+
+   * Updates a table from its integration.
+   * @param {string} updateQuery - The SQL UPDATE query to run for updating the table.
+   * @throws {MindsDbError} - Something went wrong deleting the table.
+   */
+   async  update(updateQuery: string): Promise<void> {
+    await this.tablesApiClient.updateTable(this.name, this.integration,updateQuery);
+   }
+}
+
    * Insert data into this table.
    * @param {string} select - SELECT query to insert data from.
    * @throws {MindsDbError} - Something went wrong inserting data into the table.
@@ -72,3 +82,4 @@ export default class Table {
     await this.tablesApiClient.insertTable(this.name, this.integration, select);
   }
 }
+
