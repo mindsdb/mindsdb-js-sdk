@@ -57,6 +57,14 @@ export default abstract class TablesApiClient {
   ): Promise<void>;
 
   /**
+  * Insert data into this table.
+  * @param {string} name - Name of the table to be deleted.
+  * @param {string} integration - Name of the integration the table to be deleted is a part of.
+  * @param {string} select -  SELECT query to insert data from.
+  * @throws {MindsDbError} - Something went wrong inserting data into the table.
+  */
+  abstract insertTable(name: string, integration: string, select: string): Promise<void>;
+  /**
    * Deletes a file from the files integration.
    * @param {string} name - Name of the file to be deleted.
    * @throws {MindsDbError} - Something went wrong deleting the file.
@@ -64,3 +72,13 @@ export default abstract class TablesApiClient {
   abstract deleteFile(name: string): Promise<void>;
 
 }
+
+/**
+ * Removes a table from its integration.
+ * @param {string} name - Name of the table to be removed.
+ * @param {string} integration - Name of the integration the table belongs to.
+ * @returns {Promise<void>} - Resolves when the table is successfully removed.
+ * @throws {MindsDbError} - Something went wrong removing the table.
+ */
+abstract removeTable(name: string, integration: string): Promise<void>;
+
