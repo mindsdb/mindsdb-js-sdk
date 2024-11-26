@@ -22,7 +22,7 @@ describe('Testing Models REST API client', () => {
     mockedSqlRestApiClient.runQuery.mockClear();
   });
   test('should create table', async () => {
-    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient);
+    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient, mockedAxios, mockedHttpAuthenticator);
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
         columnNames: [],
@@ -50,7 +50,7 @@ describe('Testing Models REST API client', () => {
   });
 
   test('should create or replace table', async () => {
-    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient);
+    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient, mockedAxios, mockedHttpAuthenticator);
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
         columnNames: [],
@@ -78,7 +78,7 @@ describe('Testing Models REST API client', () => {
   });
 
   test('should delete table', async () => {
-    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient);
+    const tablesRestApiClient = new TablesRestApiClient(mockedSqlRestApiClient, mockedAxios, mockedHttpAuthenticator);
     mockedSqlRestApiClient.runQuery.mockImplementation(() => {
       return Promise.resolve({
         columnNames: [],

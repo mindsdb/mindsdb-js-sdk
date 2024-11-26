@@ -3,19 +3,38 @@ import Table from './table';
 import TablesApiClient from './tablesApiClient';
 import mysql from 'mysql';
 import { MindsDbError } from '../errors';
+import HttpAuthenticator from '../httpAuthenticator';
+import { Axios } from 'axios';
+import FormData from 'form-data';
+import * as fs from 'fs';
+import Constants from '../constants';
+import { getBaseRequestConfig } from '../util/http';
+import path from 'path';
 
 /** Implementation of TablesApiClient that goes through the REST API */
 export default class TablesRestApiClient extends TablesApiClient {
   /** SQL API client to send all SQL query requests. */
   sqlClient: SqlApiClient;
 
+  /** Axios instance to send all requests. */
+  client: Axios;
+
+  /** Authenticator to use for reauthenticating if needed. */
+  authenticator: HttpAuthenticator;
+
   /**
    *
    * @param {SqlApiClient} sqlClient - SQL API client to send all SQL query requests.
    */
-  constructor(sqlClient: SqlApiClient) {
+  constructor(
+    sqlClient: SqlApiClient,
+    client: Axios,
+    authenticator: HttpAuthenticator
+  ) {
     super();
     this.sqlClient = sqlClient;
+    this.client = client;
+    this.authenticator = authenticator;
   }
 
   /**
@@ -174,6 +193,68 @@ export default class TablesRestApiClient extends TablesApiClient {
       throw new MindsDbError(sqlQueryResult.error_message);
     }
   }
+
+  private getFilesUrl(): string {
+    const baseUrl =
+      this.client.defaults.baseURL || Constants.BASE_CLOUD_API_ENDPOINT;
+    const filesUrl = new URL(Constants.FILES_URI, baseUrl);
+    return filesUrl.toString();
+  }
+  
+  /**
+   * Uploads a file asynchronously to a specified location.
+   *
+   * This method handles the process of uploading a file to a server or cloud storage. It requires the path to the
+   * file on the local filesystem, the desired name for the uploaded file, and optionally, the original name of the file.
+   * The file will be uploaded with the specified file name, but the original file name can be preserved if provided.
+   *
+   * @param {string} filePath - The local path to the file to be uploaded.
+   * @param {string} fileName - The desired name for the file once it is uploaded.
+   * @param {string} [original_file_name] - (Optional) The original name of the file before renaming. This is typically
+   * used for logging, tracking, or maintaining the original file's identity.
+   * 
+   * @returns {Promise<void>} A promise that resolves when the file upload is complete. If the upload fails,
+   * an error will be thrown.
+   *
+   * @throws {Error} If there is an issue with the upload, such as network errors, permission issues, or invalid file paths.
+   */
+  override async uploadFile(filePath: string, fileName: string, original_file_name ?: string): Promise<void> {
+    const formData = new FormData();
+
+    if(original_file_name)
+      formData.append('original_file_name', original_file_name);
+
+    if (fs.existsSync(filePath)) {
+      formData.append('file', fs.createReadStream(filePath), {
+        filename: path.basename(filePath),
+        contentType: 'multipart/form-data',
+      });
+    } else {
+      console.error('File does not exist:', filePath);
+    }
+
+    // Axios request configuration
+    const { authenticator, client } = this;
+
+    const config = getBaseRequestConfig(authenticator);
+    const filesUrl = this.getFilesUrl();
+    config.method = 'PUT';
+    config.url = `${filesUrl}/${fileName}`;
+    (config.headers = {
+      ...config.headers,
+      ...formData.getHeaders(),
+    }),
+      (config.data = formData);
+
+    try {
+      const uploadFileResponse = await client.request(config);
+    } catch (error) {
+      console.error(error);
+      throw MindsDbError.fromHttpError(error, filesUrl);
+    }
+
+  }
+
 }
 
 /**

@@ -81,6 +81,19 @@ export default abstract class TablesApiClient {
    */
   abstract deleteFile(name: string): Promise<void>;
 
+  /**
+   * Uploads a file to a remote server or storage service.
+   *
+   * @param filePath - The local path to the file that needs to be uploaded.
+   * @param fileName - The name that the file should have on the remote server after the upload.
+   * 
+   * @returns A promise that resolves when the file has been successfully uploaded.
+   *          The promise does not return any value upon success.
+   * 
+   * @throws {Error} - If there is an error during the file upload process, the promise is rejected with an error message.
+   */
+  abstract uploadFile(filePath: string, fileName: string, original_file_name ?: string): Promise<void>;
+
 }
 
 /**
