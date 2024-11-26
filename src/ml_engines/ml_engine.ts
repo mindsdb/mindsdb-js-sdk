@@ -49,6 +49,14 @@ export default class MLEngine {
   }
   
 
+   /* Lists all mlEngines for the user.
+   * @returns {Promise<Array<MLEngine>>} - List of all mlEngines.
+   */
+  async list(): Promise<Array<MLEngine>> {
+    return this.mlEnginesApiClient.getAllMLEngines();
+  }
+
+
     /**
    * Removes a specified mlEngine by its name.
    * @param {string} mlEngineName - The name of the mlEngine to remove.
