@@ -29,7 +29,13 @@ export default class Table {
     this.name = name;
     this.integration = integration;
   }
-
+  /**
+   * Removes this table from its integration.
+   * @throws {MindsDbError} - Something went wrong removing this table.
+   */
+  async removeTable(): Promise<void> {
+    await this.tablesApiClient.removeTable(this.name, this.integration);
+  }
   /**
    * Creates a table in an integration from a given SELECT statement.
    * @param {string} select - SELECT statement to use for populating the new table with data.
@@ -53,7 +59,16 @@ export default class Table {
    * @param {string} select - select statement to specify which rows should be deleted.
    * @throws {MindsDbError} - Something went wrong deleting the data from the table.
    */
-  async deleteFromTable(select?:string):Promise<void>{
-  await this.tablesApiClient.deleteFromTable(this.name,this.integration,select);
+  async deleteFromTable(select?:string):Promise<void> {
+    await this.tablesApiClient.deleteFromTable(this.name,this.integration,select);
+  }
+
+   /**
+   * Insert data into this table.
+   * @param {string} select - SELECT query to insert data from.
+   * @throws {MindsDbError} - Something went wrong inserting data into the table.
+   */
+   async insert(select: string): Promise<void> {
+    await this.tablesApiClient.insertTable(this.name, this.integration, select);
   }
 }

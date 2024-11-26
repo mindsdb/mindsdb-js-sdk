@@ -176,6 +176,14 @@ class Model {
   }
 
   /**
+   * Lists all models in the project.
+   * @returns {Array<Model>} - All models in the project.
+   */
+  listModels(): Promise<Array<Model>> {
+    return this.modelsApiClient.getAllModels(this.project);
+  }
+
+  /**
    * Describes an attribute of this model.
    * @param {string} attribute - The attribute to describe.
    * @param {string} unique_id - Optional unique id to filter the accuracy by.
