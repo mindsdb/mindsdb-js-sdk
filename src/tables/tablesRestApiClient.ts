@@ -248,7 +248,6 @@ export default class TablesRestApiClient extends TablesApiClient {
 
     try {
       const uploadFileResponse = await client.request(config);
-      console.log(JSON.stringify(uploadFileResponse, null, 2));
     } catch (error) {
       console.error(error);
       throw MindsDbError.fromHttpError(error, filesUrl);
