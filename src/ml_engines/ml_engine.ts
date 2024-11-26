@@ -1,4 +1,5 @@
 import MLEngineApiClient from './ml_enginesApiClient';
+import { Readable } from 'stream';
 
 /**
  * Represents a MindsDB mlEngine and all supported operations.
@@ -36,12 +37,25 @@ export default class MLEngine {
   }
 
   /**
-   * Lists all mlEngines for the user.
+   * Creates a mlEngine with the given name, engine, and parameters.
+   * @param {string | Readable} [codeFilePath] - Path to the code file or Readable of to be used for the mlEngine.
+   * @param {string | Readable} [modulesFilePath] - Path to the modules file or Readable of to be used for the mlEngine.
+   * @param {string} [type] - Type of the mlEngine to be created.
+   * @returns {Promise<MLEngine>} - Newly created mlEngine.
+   * @throws {MindsDbError} - Something went wrong creating the mlEngine.
+   */
+  async configure(codeFilePath:string | Readable,modulesFilePath:string | Readable,type:'venv' | 'inhouse'): Promise<void> {
+    await this.mlEnginesApiClient.createMLEngine(this.name,codeFilePath,modulesFilePath,type);
+  }
+  
+
+   /* Lists all mlEngines for the user.
    * @returns {Promise<Array<MLEngine>>} - List of all mlEngines.
    */
   async list(): Promise<Array<MLEngine>> {
     return this.mlEnginesApiClient.getAllMLEngines();
   }
+
 
     /**
    * Removes a specified mlEngine by its name.
@@ -52,6 +66,7 @@ export default class MLEngine {
   async remove(mlEngineName: string): Promise<void> {
     await this.mlEnginesApiClient.deleteMLEngine(mlEngineName);
   }
+
 
   /** Deletes this mlEngine.
    *  @throws {MindsDbError} - Something went wrong deleting the mlEngine.
