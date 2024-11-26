@@ -89,6 +89,27 @@ export default class TablesRestApiClient extends TablesApiClient {
   }
 
   /**
+   * Deletes specific row (or multiple rows) from the table present in the given integration.
+   * @param {string} name - Name of the table from which data is to be deleted.
+   * @param {string} integration - Name of the integration the table is a part of.
+   * @param {string} select - select statement to specify which rows should be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the data from the table.
+   */
+  override async deleteFromTable(name: string, integration: string,select?:string): Promise<void> { 
+    /** 
+    If select parameter is not passed then entire data from the table is deleted.
+    */
+    const sqlQuery = select ?? `DELETE FROM TABLE ${mysql.escapeId(
+      integration
+    )}.${mysql.escapeId(name)}`;
+    const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
+    if (sqlQueryResult.error_message) {
+      throw new MindsDbError(sqlQueryResult.error_message);
+    }
+  }
+  
+  
+   /*
   * Insert data into this table.
   * @param {Array<Array<any>> | string} data - A 2D array of values to insert, or a SELECT query to insert data from.
   * @throws {MindsDbError} - Something went wrong inserting data into the table.
@@ -112,6 +133,7 @@ export default class TablesRestApiClient extends TablesApiClient {
    */
   override async deleteFile(name: string): Promise<void> {
     const sqlQuery = `DROP TABLE files.${mysql.escapeId(name)}`;
+
 
     const sqlQueryResult = await this.sqlClient.runQuery(sqlQuery);
     if (sqlQueryResult.error_message) {

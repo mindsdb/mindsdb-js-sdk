@@ -54,6 +54,15 @@ export default class Table {
     await this.tablesApiClient.deleteTable(this.name, this.integration);
   }
 
+  /**
+   * Deletes specific row (or multiple rows) from the table present in the given integration.
+   * @param {string} select - select statement to specify which rows should be deleted.
+   * @throws {MindsDbError} - Something went wrong deleting the data from the table.
+   */
+  async deleteFromTable(select?:string):Promise<void> {
+    await this.tablesApiClient.deleteFromTable(this.name,this.integration,select);
+  }
+
    /**
    * Insert data into this table.
    * @param {string} select - SELECT query to insert data from.
