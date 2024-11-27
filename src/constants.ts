@@ -20,6 +20,8 @@ export default class Constants {
   /** MindsDB ML Engines endpoint. */
   public static readonly BASE_MLENGINES_URI = '/api/handlers/byom';
 
+  public static readonly FILES_URI = '/api/files';
+
   public static readonly BASE_CALLBACK_URI = '/cloud/callback/model_status';
 
 
