@@ -31,7 +31,7 @@ export default abstract class KnowledgeBaseApiClient {
    * @param {Array<string>} metadataColumns - Metadata columns name (optional)
    * @param {Array<string>} contentColumns - Content column names (default content) (optional)
    * @param {string} idColumn - ID column name (optional)
-   * @param {any} params - Params for knowledge base in JSON Object (optional)
+   * @param {unknown} params - Params for knowledge base in JSON Object (optional)
    */
   abstract createKnowledgeBase(
     name: string,
@@ -41,7 +41,7 @@ export default abstract class KnowledgeBaseApiClient {
     metadataColumns?: Array<string>,
     contentColumns?: Array<string>,
     idColumn?: string,
-    params?: any
+    params?: unknown
   ): Promise<KnowledgeBase>;
 
   /**

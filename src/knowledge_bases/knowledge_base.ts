@@ -2,6 +2,19 @@ import SqlQueryResult from '../sql/sqlQueryResult';
 import KnowledgeBaseApiClient from './knowledge_baseApiClient';
 
 /**
+ * Parameters for configuring a Knowledge Base.
+ * 
+ * @property {Array<string>} [metadata_columns] - Optional array of metadata column names.
+ * @property {Array<string>} [content_columns] - Optional array of content column names.
+ * @property {string | null} [id_column] - Optional ID column name, can be null.
+ */
+export type KnowledgeBaseParams = {
+  metadata_columns?: Array<string>;
+  content_columns?: Array<string>;
+  id_column?: string | null;
+}
+
+/**
  * Represent MindsDB Knowledge Base and all supported operations.
  */
 export default class KnowledgeBase {
@@ -18,13 +31,13 @@ export default class KnowledgeBase {
   /** Name of Embedding model used */
   model: string | null;
   /** Params for knowledge base in JSON Object */
-  params: any;
+  params: KnowledgeBaseParams;
   /** Metadata columns name */
   metadataColumns: Array<string>;
   /** Content column names (default content) */
   contentColumns: Array<string>;
   /** ID column name */
-  idColumn: string;
+  idColumn: string | null;
   /** Query string for knowledge base */
   query: string | null;
   /** Value to limit the knowledge base output result */
@@ -37,12 +50,17 @@ export default class KnowledgeBase {
    *
    * @param {KnowledgeBaseApiClient} knowledgeBaseApiClient - API client for executing Knowledge Base operations
    * @param {string} project - Project name in which knowledge base belongs
-   * @param {any} data - Knowledge Base data in JSON Object
+   * @param {unknown} data - Knowledge Base data in JSON Object
    */
   constructor(
     knowledgeBaseApiClient: KnowledgeBaseApiClient,
     project: string,
-    data: any
+    data: {
+      name: string;
+      storage: string | null;
+      model: string | null;
+      params: KnowledgeBaseParams | string;
+    }
   ) {
     this.knowledgeBaseApiClient = knowledgeBaseApiClient;
     this.project = project;
@@ -50,20 +68,21 @@ export default class KnowledgeBase {
     this.tableName = `${project}.${this.name}`;
     this.storage = data.storage || null;
     this.model = data.model || null;
-    let params: any = data.params || {};
+    let params = data.params || {};
+    let kbParams: KnowledgeBaseParams = {}
     if (typeof params === 'string') {
       try {
-        params = JSON.parse(params);
+        kbParams = JSON.parse(params);
       } catch (error) {
-        params = {};
+        kbParams = {};
       }
     }
 
-    this.metadataColumns = params['metadata_columns'] || [];
-    this.contentColumns = params['content_columns'] || [];
-    this.idColumn = params['id_column'] || null;
+    this.metadataColumns = kbParams['metadata_columns'] || [];
+    this.contentColumns = kbParams['content_columns'] || [];
+    this.idColumn = kbParams['id_column'] || null;
 
-    this.params = params;
+    this.params = kbParams;
 
     this.query = null;
     this.limit = null;
@@ -137,9 +156,11 @@ export default class KnowledgeBase {
    * Insert data into Knowledge Base
    * kb.insert([{column1: value1, column2: value2}]);
    *
-   * @param {Array<any>} records - Array of JSON object
+   * @param {Array<unknown>} records - Array of JSON object
    */
-  async insert(records: Array<any>) {
+  async insert(records: Array<{
+    [key: string]: unknown;
+  }>) {
     let valueString = '';
     records.forEach((row) => {
       valueString += '(';

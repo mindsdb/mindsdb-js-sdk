@@ -2,7 +2,7 @@ import { Axios } from 'axios';
 import Constants from '../constants';
 import SqlApiClient from '../sql/sqlApiClient';
 import SqlQueryResult from '../sql/sqlQueryResult';
-import KnowledgeBase from './knowledge_base';
+import KnowledgeBase, { KnowledgeBaseParams } from './knowledge_base';
 import KnowledgeBaseApiClient from './knowledge_baseApiClient';
 
 /** Implementation of KnowledgeBaseApiClient that goes through the REST API */
@@ -34,7 +34,12 @@ export default class KnowledgeBaseRestApiClient extends KnowledgeBaseApiClient {
 
     const response = await this.sqlClient.runQuery(astQuery);
     return response.rows.map(
-      (row) => new KnowledgeBase(this, row.project, row)
+      (row) => new KnowledgeBase(this, row.project, row as {
+        name: string;
+        storage: string | null;
+        model: string | null;
+        params: KnowledgeBaseParams | string;
+      })
     );
   }
 
@@ -71,7 +76,7 @@ export default class KnowledgeBaseRestApiClient extends KnowledgeBaseApiClient {
    * @param {Array<string>} metadataColumns - Metadata columns name (optional)
    * @param {Array<string>} contentColumns - Content column names (default content) (optional)
    * @param {string} idColumn - ID column name (optional)
-   * @param {any} params - Params for knowledge base in JSON Object (optional)
+   * @param {unknown} params - Params for knowledge base in JSON Object (optional)
    */
   override async createKnowledgeBase(
     name: string,
@@ -81,9 +86,9 @@ export default class KnowledgeBaseRestApiClient extends KnowledgeBaseApiClient {
     metadataColumns?: string[],
     contentColumns?: string[],
     idColumn?: string,
-    params?: any
+    params?: unknown
   ): Promise<KnowledgeBase> {
-    let paramsOut: { [key: string]: any } = {};
+    let paramsOut: { [key: string]: unknown } = {};
     if (metadataColumns) {
       paramsOut['metadata_columns'] = metadataColumns;
     }
