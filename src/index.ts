@@ -13,6 +13,7 @@ import {
 } from './util/http';
 import TablesModule from './tables/tablesModule';
 import AgentsModule from './agents/agentsModule';
+import skillsModule from './skills/skillsModule';
 import HttpAuthenticator from './httpAuthenticator';
 import { Axios } from 'axios';
 
@@ -61,6 +62,7 @@ const MLEngines = new MLEnginesModule.MLEnginesRestApiClient(
   httpAuthenticator
 );
 const Agents = new AgentsModule.AgentsRestApiClient(defaultAxiosInstance);
+const Skills = new skillsModule.SkillsRestApiClient(defaultAxiosInstance);
 const Callbacks = new CallbacksModule.CallbacksRestApiClient(
   defaultAxiosInstance,
   httpAuthenticator
@@ -125,6 +127,7 @@ export default {
   MLEngines,
   Agents,
   Callbacks,
+  Skills,
 };
 export {
   ConnectionOptions,
