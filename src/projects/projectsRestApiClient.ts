@@ -20,7 +20,9 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
 
   /**
    * Constructor for Projects API client.
+   * @param {SqlApiClient} sqlClient - SQL API client to send all SQL query requests.
    * @param {Axios} client - Axios instance to send all HTTP requests.
+   * @param {HttpAuthenticator} authenticator - Authenticator to use for reauthenticate if needed.
    */
   constructor(
     sqlClient: SqlApiClient,
@@ -42,6 +44,7 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
 
   /**
    * Gets all MindsDB projects for the current user.
+   *
    * @returns {Promise<Array<Project>>} - All projects.
    * @throws {MindsDbError} - Something went wrong fetching projects.
    */
@@ -56,15 +59,42 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
       if (!projectsResponse.data) {
         return [];
       }
-      return projectsResponse.data;
+
+      const projects = projectsResponse.data.map((project: any) => {
+        return new Project(this, project.name);
+      });
+
+      return projects;
     } catch (error) {
       throw MindsDbError.fromHttpError(error, projectsUrl);
     }
   }
 
   /**
+   * Gets a MindsDB project by name.
    *
-   * @param name - Name of the project to create.
+   * @param {string} name - Name of the project to get.
+   * @returns {Promise<Project>} - The project.
+   */
+  override async getProject(name: string): Promise<Project> {
+    const projectsUrl = this.getProjectsUrl() + `/${name}`;
+    const { authenticator, client } = this;
+
+    const projectResponse = await client.get(
+      projectsUrl,
+      getBaseRequestConfig(authenticator)
+    );
+    if (!projectResponse.data) {
+      throw new MindsDbError('Project not found');
+    }
+
+    return new Project(this, projectResponse.data.name);
+  }
+
+  /**
+   * Creates a new MindsDB project.
+   *
+   * @param {string} name - Name of the project to create.
    * @returns {Promise<Project>} - The created project.
    */
   override async createProject(name: string): Promise<Project> {
@@ -79,6 +109,7 @@ export default class ProjectsRestApiClient extends ProjectsApiClient {
   }
 
   /**
+   * Delete a MindsDB project by name.
    *
    * @param {string} name - Name of the project to delete.
    */
