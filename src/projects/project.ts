@@ -1,13 +1,13 @@
 import ProjectsApiClient from './projectsApiClient';
 
 /**
- * Represents a MindsDB project and all supported operations.
+ * Represents a MindsDB project and all supported operation related to project.
  */
 export default class Project {
-  /** API client to use for executing mlEngine operations. */
+  /** API client to use for executing project operations. */
   projectApiClient: ProjectsApiClient;
 
-  /** Name of the mlEngine. */
+  /** Name of the project. */
   name: string;
 
   /**
