@@ -90,11 +90,11 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       if (where.length === 0) {
         return whereClause;
       }
-      whereClause = `WHERE ${where[0]}\n`;
+      whereClause = `WHERE ${where[0]}`;
       if (where.length === 1) {
         return whereClause;
       }
-      whereClause += where
+      whereClause += '\n' + where
         .slice(1)
         .map(
           (o) =>
@@ -104,7 +104,7 @@ export default class ModelsRestApiClient extends ModelsApiClient {
             `AND ${o}`,
         )
         .join('\n');
-    } else {
+    } else if (where) {
       whereClause = `WHERE ${where}`;
     }
     return whereClause;
@@ -272,7 +272,9 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     )}.${mysql.escapeId(name)}.${version}`;
     const whereClause = this.makeWhereClause(options['where'] || []);
     const usingClause = this.makeUsingClause(options['using'] || []);
-    const selectQuery = [selectClause, whereClause, usingClause].join('\n');
+    const selectQuery = [selectClause, whereClause, usingClause]
+      .filter(Boolean)
+      .join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
@@ -320,7 +322,9 @@ export default class ModelsRestApiClient extends ModelsApiClient {
       joinClause,
       whereClause,
       limitClause,
-    ].join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(selectQuery);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
@@ -448,7 +452,9 @@ export default class ModelsRestApiClient extends ModelsApiClient {
     )} FROM ${mysql.escapeId(finetuneOptions['integration'])}`;
     const selectClause = this.makeTrainingSelectClause(finetuneOptions);
     const usingClause = this.makeTrainingUsingClause(finetuneOptions);
-    const query = [finetuneClause, selectClause, usingClause].join('\n');
+    const query = [finetuneClause, selectClause, usingClause]
+      .filter(Boolean)
+      .join('\n');
     const sqlQueryResult = await this.sqlClient.runQuery(query);
     if (sqlQueryResult.error_message) {
       throw new MindsDbError(sqlQueryResult.error_message);
