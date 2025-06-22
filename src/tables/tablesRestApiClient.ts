@@ -109,6 +109,17 @@ export default class TablesRestApiClient extends TablesApiClient {
 
 
   /**
+   * Removes a table from its integration.
+   * @param {string} name - Name of the table to be removed.
+   * @param {string} integration - Name of the integration the table to be removed is a part of.
+   * @throws {MindsDbError} - Something went wrong removing the table.
+   */
+  override async removeTable(name: string, integration: string): Promise<void> {
+    await this.deleteTable(name, integration);
+  }
+
+
+  /**
    * Updates a table from its integration.
    * @param {string} name - Name of the table to be updated.
    * @param {string} integration - Name of the integration the table to be updated is a part of.
@@ -149,8 +160,7 @@ export default class TablesRestApiClient extends TablesApiClient {
    * @throws {MindsDbError} - Something went wrong deleting the data from the table.
    */
   override async deleteFromTable(name: string, integration: string, select?: string): Promise<void> {
-    /** 
-    If select parameter is not passed then entire data from the table is deleted.
+    /** If select parameter is not passed then entire data from the table is deleted.
     */
     const sqlQuery = select ?? `DELETE FROM TABLE ${mysql.escapeId(
       integration
@@ -214,8 +224,7 @@ export default class TablesRestApiClient extends TablesApiClient {
    * @param {string} fileName - The desired name for the file once it is uploaded.
    * @param {string} [original_file_name] - (Optional) The original name of the file before renaming. This is typically
    * used for logging, tracking, or maintaining the original file's identity.
-   * 
-   * @returns {Promise<void>} A promise that resolves when the file upload is complete. If the upload fails,
+   * * @returns {Promise<void>} A promise that resolves when the file upload is complete. If the upload fails,
    * an error will be thrown.
    *
    * @throws {Error} If there is an issue with the upload, such as network errors, permission issues, or invalid file paths.
