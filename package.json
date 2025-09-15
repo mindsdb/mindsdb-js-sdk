@@ -13,9 +13,10 @@
     "url": "https://github.com/mindsdb/mindsdb-js-sdk/issues"
   },
   "main": "dist/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node fix-esm-imports.js",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint * --ext .ts",
     "test": "jest"

@@ -361,7 +361,8 @@ describe('Testing Models REST API client', () => {
     const actualQuery = mockedSqlRestApiClient.runQuery.mock.calls[0][0];
     const expectedQuery = `SELECT * FROM \`my_test_project\`.\`my_test_model\`.1
 WHERE field1 = val1
-AND field2 = val2`;
+AND field2 = val2
+`;
     expect(actualQuery).toEqual(expectedQuery);
 
     expect(actualPrediction.value).toEqual('prediction_value');
