@@ -75,7 +75,6 @@ export default class AgentsRestApiClient extends AgentsApiClient {
    * @param {string} name Agent name to create
    * @param {string} [model] Model to use for the agent
    * @param {string} [provider] Provider to use for the agent
-   * @param {Array<string>} [skills] Skills to assign to the agent
    * @param {any} [params] Additional parameters for the agent
    * @returns {Promise<Agent>} A promise that resolves to the created agent.
    */
@@ -84,7 +83,6 @@ export default class AgentsRestApiClient extends AgentsApiClient {
     name: string,
     model?: string,
     provider?: string,
-    skills?: Array<string>,
     params?: any
   ): Promise<Agent> {
     const agentsUrl = this.getAgentsUrl(project);
@@ -98,13 +96,11 @@ export default class AgentsRestApiClient extends AgentsApiClient {
       const agent: {
         name: string;
         model_name?: string;
-        skills?: Array<string>;
         params?: any;
         provider?: string | null;
       } = {
         name: name,
         model_name: model || DEFAULT_LLM_MODEL,
-        skills: skills || [],
         provider: provider || null,
         params: agentsParams,
       };
@@ -124,7 +120,6 @@ export default class AgentsRestApiClient extends AgentsApiClient {
    * @param {string} agentName Name of the agent to update
    * @param {string} [updatedName] New name for the agent
    * @param {string} [updatedModel] New model for the agent
-   * @param {Array<string>} [updatedSkills] New skills for the agent
    * @param {any} [updatedParams] New parameters for the agent
    * @returns {Promise<Agent>} A promise that resolves to the updated agent.
    */
@@ -133,41 +128,19 @@ export default class AgentsRestApiClient extends AgentsApiClient {
     agentName: string,
     updatedName?: string,
     updatedModel?: string,
-    updatedSkills?: Array<string>,
     updatedParams?: any
   ): Promise<Agent> {
     const agentsUrl = this.getAgentsUrl(project) + `/${agentName}`;
     try {
       const agent = await this.getAgent(project, agentName);
-      const updatedSkillSet = new Set<string>();
-      if (updatedSkills) {
-        updatedSkills?.forEach((skill) => updatedSkillSet.add(skill));
-      }
-      const existingSkillSet = new Set<string>(agent.skills);
-      const skillsToAddSet = new Set<string>(updatedSkillSet);
-      existingSkillSet.forEach((skill) => {
-        if (skillsToAddSet.has(skill)) {
-          skillsToAddSet.delete(skill);
-        }
-      });
-      const skillsToRemoveSet = new Set<string>(existingSkillSet);
-      updatedSkillSet.forEach((skill) => {
-        if (skillsToRemoveSet.has(skill)) {
-          skillsToRemoveSet.delete(skill);
-        }
-      });
 
       const updatedAgent: {
         name: string;
         model_name: string;
-        skills_to_add: Array<string>;
-        skills_to_remove: Array<string>;
         params: any;
       } = {
         name: updatedName || agent.name,
         model_name: updatedModel || agent.model,
-        skills_to_add: Array.from(skillsToAddSet),
-        skills_to_remove: Array.from(skillsToRemoveSet),
         params: updatedParams || agent.params,
       };
 

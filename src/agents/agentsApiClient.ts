@@ -27,7 +27,6 @@ export default abstract class AgentsApiClient {
    * @param {string} name - The name of the agent.
    * @param {string} model - The model of the agent.
    * @param {string} provider - The provider of the agent.
-   * @param {Array<string>} skills - An array of skills for the agent.
    * @param {any} [params] - Optional parameters for the agent.
    * @throws {MindsDbError} If the agent cannot be created.
    * @returns {Promise<Agent>} A promise that resolves to the created agent.
@@ -37,7 +36,6 @@ export default abstract class AgentsApiClient {
     name: string,
     model: string,
     provider: string,
-    skills: Array<string>,
     params?: any
   ): Promise<Agent>;
 
@@ -47,7 +45,6 @@ export default abstract class AgentsApiClient {
    * @param {string} agentName - The current name of the agent.
    * @param {string} [updatedName] - The new name of the agent (optional).
    * @param {string} [updatedModel] - The new model of the agent (optional).
-   * @param {Array<string>} [updatedSkills] - An array of updated skills for the agent (optional).
    * @param {any} [updatedParams] - Optional updated parameters for the agent.
    * @throws {MindsDbError} If the agent cannot be updated.
    * @returns {Promise<Agent>} A promise that resolves to the updated agent.
@@ -57,7 +54,6 @@ export default abstract class AgentsApiClient {
     agentName: string,
     updatedName?: string,
     updatedModel?: string,
-    updatedSkills?: Array<string>,
     updatedParams?: any
   ): Promise<Agent>;
 
