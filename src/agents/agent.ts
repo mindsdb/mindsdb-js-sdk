@@ -14,8 +14,6 @@ export default class Agent {
   name: string;
   /** Model name */
   model: string;
-  /** Skills of the agent */
-  skills: Array<string>;
   /** Additional parameters */
   params: any;
   /** Rest API client to use for executing agent operations */
@@ -27,7 +25,6 @@ export default class Agent {
    * @param {string} project - Project name to which agent belongs to
    * @param {string} name - Agent name
    * @param {string} model - Model name
-   * @param {Array<string>} skills - Skills of the agent
    * @param {any} params - Additional parameters
    * @param {AgentsRestApiClient} agentsRestApiClient - Rest API client to use for executing agent operations
    */
@@ -35,14 +32,12 @@ export default class Agent {
     project: string,
     name: string,
     model: string,
-    skills: Array<string>,
     params: any,
     agentsRestApiClient: AgentsRestApiClient
   ) {
     this.project = project;
     this.name = name;
     this.model = model;
-    this.skills = skills;
     this.params = params;
     this.agentsRestApiClient = agentsRestApiClient;
   }
@@ -64,7 +59,6 @@ export default class Agent {
       project,
       json.name,
       json.model,
-      json.skills.map((skill: any) => skill.name),
       json.params || {},
       agentsRestApiClient
     );

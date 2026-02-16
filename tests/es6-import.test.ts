@@ -23,7 +23,6 @@ describe('Testing ES6 import compatibility', () => {
     expect(typeof MindsDB.Agents).toBe('object');
     expect(typeof MindsDB.Callbacks).toBe('object');
     expect(typeof MindsDB.KnowledgeBases).toBe('object');
-    expect(typeof MindsDB.Skills).toBe('object');
   });
 
   test('should be able to import named exports using ES6 syntax', async () => {
